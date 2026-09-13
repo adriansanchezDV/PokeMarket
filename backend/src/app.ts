@@ -15,8 +15,8 @@ app.get('/api/ping', (_req, res) => {
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
-  })
-})
+  });
+});
 
 app.use(notFound);
 app.use(errorHandler);
