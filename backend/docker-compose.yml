@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: pokemarket-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pokemarket
+      POSTGRES_USER: pokemarket
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pokemarket_postgres_data:/var/lib/postgresql
+
+volumes:
+  pokemarket_postgres_data:
+    external: true
