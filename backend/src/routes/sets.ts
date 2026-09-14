@@ -1,9 +1,10 @@
-import { Router } from 'express'
-import { getAllSets, getSingleSet } from '../controllers/setsController.js'
+import { Router } from 'express';
+import { getAllSets, getSingleSet, syncSingleSet } from '../controllers/setsController.js';
 
-const router = Router()
+const router = Router();
 
-router.get('/', getAllSets)
-router.get('/:id', getSingleSet)
+router.get('/', getAllSets);
+router.get('/:id', getSingleSet);
+router.post('/:id/sync', syncSingleSet);
 
-export default router
+export default router;

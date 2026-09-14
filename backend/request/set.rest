@@ -1,0 +1,12 @@
+### Obtener todos los sets
+GET http://localhost:3001/api/sets
+
+### Obtener Darkness Ablaze
+GET http://localhost:3001/api/sets/swsh3
+
+
+### Sincronizar Darkness Ablaze
+POST http://localhost:3001/api/sets/swsh3/sync
+
+### Sincronizar Furret
+POST http://localhost:3001/api/cards/swsh3-136/sync
