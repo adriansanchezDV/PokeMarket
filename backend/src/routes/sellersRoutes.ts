@@ -10,8 +10,11 @@ import auth from '../middleware/auth.js';
 
 import validate from '../middleware/validate.js';
 
-import { createSellerProfileSchema, updateSellerProfileSchema } from '../schemas/sellerProfiles.js';
 import requireRole from '../middleware/requireRole.js';
+import {
+  createSellerProfileSchema,
+  updateSellerProfileSchema,
+} from '../schemas/sellerProfilesSchema.js';
 
 const router = Router();
 

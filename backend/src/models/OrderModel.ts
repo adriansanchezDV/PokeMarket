@@ -5,7 +5,7 @@ import sequelize from '../config/database.js';
 class Order extends Model {
   declare id: number;
   declare userId: number;
-  declare status: string;
+  declare status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled';
   declare total: string;
   declare createdAt: Date;
   declare updatedAt: Date | null;

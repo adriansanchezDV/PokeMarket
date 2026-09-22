@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { getAllSets, getSingleSet, syncSingleSet } from '../controllers/setsController.js';
+import { getAllSets } from '../services/setsService.js';
+import { getSingleSet, syncSingleSet } from '../controllers/setsController.js';
 
 const router = Router();
 

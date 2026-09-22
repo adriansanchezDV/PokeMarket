@@ -1,0 +1,124 @@
+GET http://localhost:3001/api/products
+
+###
+GET http://localhost:3001/api/products/99999
+
+###
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "adrian3@test.com",
+  "password": "12345678"
+}
+
+
+### Crear producto
+POST http://localhost:3001/api/products
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJhZHJpYW4zQHRlc3QuY29tIiwicm9sZSI6ImN1c3RvbWVyIiwiaWF0IjoxNzg5OTI4MjI4LCJleHAiOjE3ODk5MzE4Mjh9.PXUrY_9TXk1sqaVaWbFERTb3bvcFCNvlqrANIf9y6Ew
+Content-Type: application/json
+
+{
+  "cardId": 2,
+  "condition": "Near Mint",
+  "language": "English",
+  "price": 12.50,
+  "stock": 3,
+  "description": "Carta en perfecto estado"
+}
+
+###
+POST http://localhost:3001/api/products
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc4OTkyNzk2NywiZXhwIjoxNzg5OTMxNTY3fQ.MmSLiJAHtVlejGAWgcrnq7JiO9z7_A827-JXyLWHU3s
+Content-Type: application/json
+
+{
+  "cardId": 2,
+  "condition": "Near Mint",
+  "language": "English",
+  "price": -12.50,
+  "stock": 3
+}
+
+### Actualizar precio y stock
+PATCH http://localhost:3001/api/products/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc4OTkyOTI4OSwiZXhwIjoxNzg5OTMyODg5fQ.7Uvki0E6iKU0MyjWFTZYV58whV57mv9LIf_Do48TJFE
+Content-Type: application/json
+
+{
+    "price": 15.00,
+    "stock": 5
+}
+
+### 
+POST http://localhost:3001/api/products
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc4OTkyOTI4OSwiZXhwIjoxNzg5OTMyODg5fQ.7Uvki0E6iKU0MyjWFTZYV58whV57mv9LIf_Do48TJFE
+Content-Type: application/json
+
+{
+  "cardId": 2,
+  "condition": "Excellent",
+  "language": "Spanish",
+  "price": 20,
+  "stock": 1,
+  "description": "Producto del segundo vendedor"
+}
+
+### Eliminar mi producto
+DELETE http://localhost:3001/api/products/1
+Authorization: Bearer reg
+
+### Comprobar que ya no existe
+GET http://localhost:3001/api/products/3
+
+### Products - pagination
+GET http://localhost:3001/api/products?page=1&limit=2
+
+### Products - filter by card
+GET http://localhost:3001/api/products?cardId=2
+
+### Products - filter by seller
+GET http://localhost:3001/api/products?sellerProfileId=1
+
+### Products - filter by condition
+GET http://localhost:3001/api/products?condition=Poor%20Mint
+
+### Products - filter by language
+GET http://localhost:3001/api/products?language=English
+
+### Products - minimum price
+GET http://localhost:3001/api/products?minPrice=21
+
+### Products - maximum price
+GET http://localhost:3001/api/products?maxPrice=20
+
+
+### Products - filters + pagination
+GET http://localhost:3001/api/products?cardId=2&condition=Near%20Mint&language=English&minPrice=10&maxPrice=20&page=1&limit=5
+
+### Invalid page
+GET http://localhost:3001/api/products?page=0
+
+### Invalid limit
+GET http://localhost:3001/api/products?limit=101
+
+### Invalid cardId
+GET http://localhost:3001/api/products?cardId=-1
+
+### Invalid price range
+GET http://localhost:3001/api/products?minPrice=20&maxPrice=10
+
+### Products - price ascending
+GET http://localhost:3001/api/products?sort=price&order=asc
+
+### Products - price descending
+GET http://localhost:3001/api/products?sort=price&order=desc
+
+### Products - stock ascending
+GET http://localhost:3001/api/products?sort=stock&order=asc
+
+### Products - newest first
+GET http://localhost:3001/api/products?sort=createdAt&order=desc
+
+### Products - filters + pagination + sorting
+GET http://localhost:3001/api/products?cardId=2&condition=Near%20Mint&language=English&minPrice=10&maxPrice=20&sort=price&order=asc&page=1&limit=5

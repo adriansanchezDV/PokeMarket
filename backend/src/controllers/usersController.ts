@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 
-import { User } from '../models/index.js';
+import { User } from '../models/indexModel.js';
 
 export const getMe = async (req: Request, res: Response, next: NextFunction) => {
   try {

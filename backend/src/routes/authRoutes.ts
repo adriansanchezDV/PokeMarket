@@ -5,8 +5,8 @@ import { register, login } from '../controllers/authController.js';
 
 import validate from '../middleware/validate.js';
 
-import { registerSchema, loginSchema } from '../schemas/auth.js';
 import requireRole from '../middleware/requireRole.js';
+import { loginSchema, registerSchema } from '../schemas/authSchema.js';
 
 const router = Router();
 

@@ -1,13 +1,13 @@
-import User from './User.js';
-import SellerProfile from './SellerProfile.js';
-import Set from './Set.js';
-import Card from './Card.js';
-import Product from './Product.js';
-import Cart from './Cart.js';
-import CartItem from './CartItem.js';
-import Order from './Order.js';
-import OrderItem from './OrderItem.js';
-import Favorite from './Favorite.js';
+import Card from './CardModel.js';
+import CartItem from './CartItemModel.js';
+import Cart from './CartModel.js';
+import Favorite from './FavoriteModel.js';
+import OrderItem from './OrderItemModel.js';
+import Order from './OrderModel.js';
+import Product from './ProductModel.js';
+import SellerProfile from './SellerProfileModel.js';
+import User from './UserModel.js';
+import Set from './SetModel.js';
 
 // User <-> SellerProfile
 User.hasOne(SellerProfile, {

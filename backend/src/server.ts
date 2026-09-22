@@ -1,7 +1,7 @@
 import app from './app.js';
 import config from './config/env.js';
 import sequelize from './config/database.js';
-import './models/index.js';
+import './models/indexModel.js';
 
 const startServer = async () => {
   try {

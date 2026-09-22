@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 
-import { SellerProfile } from '../models/index.js';
+import { SellerProfile } from '../models/indexModel.js';
 
 export const createSellerProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
