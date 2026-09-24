@@ -20,3 +20,7 @@ export const updateProductSchema = z
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided',
   });
+
+export const updateProductStatusSchema = z.object({
+  isActive: z.boolean(),
+});

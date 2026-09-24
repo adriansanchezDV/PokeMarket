@@ -2,10 +2,11 @@ import { Request, RequestHandler, Response } from 'express';
 import SellerProfile from '../models/SellerProfileModel.js';
 import {
   createProduct,
-  deleteProduct,
   getAllProducts,
   getProductById,
+  getSellerProducts,
   updateProduct,
+  updateProductStatus,
 } from '../services/productService.js';
 
 export const getProducts: RequestHandler = async (req, res, next) => {
@@ -229,52 +230,55 @@ export const updateSingleProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteSingleProduct = async (req: Request, res: Response) => {
+export const getSellerProductsController: RequestHandler = async (req, res, next) => {
   try {
-    if (!req.user) {
-      res.status(401).json({
-        error: 'Authentication required',
+    const products = await getSellerProducts(req.user!.id);
+
+    return res.status(200).json(products);
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Seller profile not found') {
+      return res.status(404).json({
+        error: error.message,
       });
-      return;
+    }
+
+    next(error);
+  }
+};
+
+export const updateProductStatusController: RequestHandler = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id < 1) {
+      return res.status(400).json({
+        error: 'Invalid product id',
+      });
     }
 
     const sellerProfile = await SellerProfile.findOne({
       where: {
-        userId: req.user.id,
+        userId: req.user!.id,
       },
     });
 
     if (!sellerProfile) {
-      res.status(404).json({
+      return res.status(404).json({
         error: 'Seller profile not found',
       });
-      return;
     }
 
-    const id = Number(req.params.id);
+    const product = await updateProductStatus(id, sellerProfile.id, req.body.isActive);
 
-    if (!Number.isInteger(id) || id < 1) {
-      res.status(400).json({
-        error: 'Invalid product id',
-      });
-      return;
-    }
-
-    const deleted = await deleteProduct(id, sellerProfile.id);
-
-    if (!deleted) {
-      res.status(404).json({
+    if (!product) {
+      return res.status(404).json({
         error: 'Product not found',
       });
-      return;
     }
 
-    res.status(204).send();
+    return res.status(200).json(product);
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: 'Error deleting product',
-    });
+    next(error);
   }
 };
+

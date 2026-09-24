@@ -5,8 +5,14 @@ import sequelize from '../config/database.js';
 class Order extends Model {
   declare id: number;
   declare userId: number;
-  declare status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled';
+  declare status: 'pending' | 'paid' | 'completed' | 'cancelled';
   declare total: string;
+  declare shippingAddress: {
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
+  };
   declare createdAt: Date;
   declare updatedAt: Date | null;
 }
@@ -18,21 +24,31 @@ Order.init(
       autoIncrement: true,
       primaryKey: true,
     },
+
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       field: 'user_id',
     },
+
     status: {
       type: DataTypes.STRING(30),
       allowNull: false,
       defaultValue: 'pending',
     },
+
     total: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+
+    shippingAddress: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      field: 'shipping_address',
+    },
   },
+
   {
     sequelize,
     tableName: 'orders',

@@ -10,6 +10,7 @@ class Product extends Model {
   declare language: string;
   declare price: string;
   declare stock: number;
+  declare isActive: boolean;
   declare description: string | null;
   declare createdAt: Date;
   declare updatedAt: Date | null;
@@ -48,6 +49,12 @@ Product.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+      field: 'is_active',
     },
     description: {
       type: DataTypes.TEXT,

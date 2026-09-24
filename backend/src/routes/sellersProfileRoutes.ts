@@ -24,8 +24,6 @@ router.post(
   requireRole('seller'),
   validate(createSellerProfileSchema),
   createSellerProfile,
-  getSellerProfile,
-  updateSellerProfile,
 );
 
 router.patch(

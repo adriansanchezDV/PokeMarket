@@ -53,6 +53,18 @@ Product.belongsTo(Card, {
   as: 'card',
 });
 
+// SellerProfile <-> OrderItem
+
+SellerProfile.hasMany(OrderItem, {
+  foreignKey: 'sellerProfileId',
+  as: 'orderItems',
+});
+
+OrderItem.belongsTo(SellerProfile, {
+  foreignKey: 'sellerProfileId',
+  as: 'sellerProfile',
+});
+
 // User <-> Cart
 User.hasOne(Cart, {
   foreignKey: 'userId',

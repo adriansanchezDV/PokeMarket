@@ -7,6 +7,82 @@ Content-Type: application/json
   "password": "12345678"
 }
 
-### Crear pedido desde el carrito
+
+### AÑADIR PRODUCTO AL CARRITO
+POST http://localhost:3001/api/cart/items/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDEwMTA1NiwiZXhwIjoxNzkwMTA0NjU2fQ.rBM0lYyL9a-j0jG8QHP6JqjBPdCzYiA1BItmm5UApO8
+
+
+### VER CARRITO
+GET http://localhost:3001/api/cart
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDEwMTA1NiwiZXhwIjoxNzkwMTA0NjU2fQ.rBM0lYyL9a-j0jG8QHP6JqjBPdCzYiA1BItmm5UApO8
+### Crear pedido
 POST http://localhost:3001/api/orders
-Authorization: Bearer {{customerToken}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDEwMTA1NiwiZXhwIjoxNzkwMTA0NjU2fQ.rBM0lYyL9a-j0jG8QHP6JqjBPdCzYiA1BItmm5UApO8
+Content-Type: application/json
+
+{
+  "shippingAddress": {
+    "street": "Calle Mayor 10",
+    "city": "Madrid",
+    "postalCode": "28013",
+    "country": "España"
+  }
+}
+
+### COMPROBAR CARRITO DESPUÉS DEL ORDER
+GET http://localhost:3001/api/cart
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDEwMTA1NiwiZXhwIjoxNzkwMTA0NjU2fQ.rBM0lYyL9a-j0jG8QHP6JqjBPdCzYiA1BItmm5UApO8
+
+### Obtener mis pedidos
+GET http://localhost:3001/api/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDA5NzYzNywiZXhwIjoxNzkwMTAxMjM3fQ.HtkMrYKIqnGBAaAyCwzHzMnE5oLOiLYagoamf8-aPig
+
+### DETALLE DEL PEDIDO 2
+GET http://localhost:3001/api/orders/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDA5ODAwOSwiZXhwIjoxNzkwMTAxNjA5fQ.XlQ5IIVvCd-Y_RgZuVHlZ0CYVYTt5zJ-w8BVNG8Q35E
+
+### Pagar pedido
+POST http://localhost:3001/api/orders/3/pay
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDEwMTA1NiwiZXhwIjoxNzkwMTA0NjU2fQ.rBM0lYyL9a-j0jG8QHP6JqjBPdCzYiA1BItmm5UApO8
+
+###
+GET http://localhost:3001/api/seller/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDEwMTA1NiwiZXhwIjoxNzkwMTA0NjU2fQ.rBM0lYyL9a-j0jG8QHP6JqjBPdCzYiA1BItmm5UApO8
+
+###
+PATCH http://localhost:3001/api/seller/orders/3/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDEwMzM5NCwiZXhwIjoxNzkwMTA2OTk0fQ.Isk3F3UVE9AioKD3Thx_EDdaO6GiTkPCwzzKraRmHCc
+Content-Type: application/json
+
+{
+  "status": "delivered"
+}
+
+
+
+
+
+
+
+
+
+### customer1
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Customer One",
+  "email": "customer1@test.com",
+  "password": "12345678"
+}
+
+### seller2
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Seller Two",
+  "email": "seller2@test.com",
+  "password": "12345678!"
+}

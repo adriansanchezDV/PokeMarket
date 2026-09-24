@@ -2,6 +2,7 @@ import { col, Op } from 'sequelize';
 import Product from '../models/ProductModel.js';
 import Card from '../models/CardModel.js';
 import SellerProfile from '../models/SellerProfileModel.js';
+import OrderItem from '../models/OrderItemModel.js';
 
 export const getAllProducts = async (filters: {
   cardId?: number;
@@ -28,8 +29,9 @@ export const getAllProducts = async (filters: {
     order,
   } = filters;
 
-  const where: Record<string, unknown> = {};
-
+  const where: Record<string, unknown> = {
+    isActive: true,
+  };
   if (cardId !== undefined) {
     where.cardId = cardId;
   }
@@ -199,7 +201,35 @@ export const updateProduct = async (
   });
 };
 
-export const deleteProduct = async (id: number, sellerProfileId: number) => {
+export const getSellerProducts = async (userId: number) => {
+  const sellerProfile = await SellerProfile.findOne({
+    where: { userId },
+  });
+
+  if (!sellerProfile) {
+    throw new Error('Seller profile not found');
+  }
+
+  return Product.findAll({
+    where: {
+      sellerProfileId: sellerProfile.id,
+    },
+    include: [
+      {
+        model: Card,
+        as: 'card',
+        attributes: ['id', 'name', 'number', 'rarity', 'imageUrl'],
+      },
+    ],
+    order: [['created_at', 'DESC']],
+  });
+};
+
+export const updateProductStatus = async (
+  id: number,
+  sellerProfileId: number,
+  isActive: boolean,
+) => {
   const product = await Product.findOne({
     where: {
       id,
@@ -208,10 +238,26 @@ export const deleteProduct = async (id: number, sellerProfileId: number) => {
   });
 
   if (!product) {
-    return false;
+    return null;
   }
 
-  await product.destroy();
+  await product.update({
+    isActive,
+  });
 
-  return true;
+  return Product.findByPk(product.id, {
+    include: [
+      {
+        model: Card,
+        as: 'card',
+        attributes: ['id', 'name', 'number', 'rarity', 'imageUrl'],
+      },
+      {
+        model: SellerProfile,
+        as: 'sellerProfile',
+        attributes: ['id', 'storeName', 'description'],
+      },
+    ],
+  });
 };
+

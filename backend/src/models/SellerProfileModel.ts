@@ -53,7 +53,7 @@ SellerProfile.init(
   {
     sequelize,
     tableName: 'seller_profiles',
-    timestamps: false,
+    timestamps: true,
   },
 );
 
