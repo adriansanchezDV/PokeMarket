@@ -4,12 +4,36 @@ import { syncCard, syncSetCards } from '../services/sync/cardSyncService.js';
 
 export const getCards = async (req: Request, res: Response) => {
   try {
-    const { name, setId, rarity, category, page, limit } = req.query;
+    const { search, setId, rarity, category, number, artist, type, minHp, maxHp, page, limit } =
+      req.query;
 
     const currentPage = typeof page === 'string' ? Number(page) : 1;
 
     const currentLimit = typeof limit === 'string' ? Number(limit) : 20;
 
+    const minHpValue = minHp !== undefined ? Number(minHp) : undefined;
+    const maxHpValue = maxHp !== undefined ? Number(maxHp) : undefined;
+
+    if (minHpValue !== undefined && (!Number.isInteger(minHpValue) || minHpValue < 0)) {
+      res.status(400).json({
+        error: 'Invalid minHp',
+      });
+      return;
+    }
+
+    if (maxHpValue !== undefined && (!Number.isInteger(maxHpValue) || maxHpValue < 0)) {
+      res.status(400).json({
+        error: 'Invalid maxHp',
+      });
+      return;
+    }
+
+    if (minHpValue !== undefined && maxHpValue !== undefined && minHpValue > maxHpValue) {
+      res.status(400).json({
+        error: 'minHp cannot be greater than maxHp',
+      });
+      return;
+    }
     // Validar page
     if (!Number.isInteger(currentPage) || currentPage < 1) {
       res.status(400).json({
@@ -38,15 +62,24 @@ export const getCards = async (req: Request, res: Response) => {
     }
 
     const filters = {
-      name: typeof name === 'string' ? name : undefined,
+      search: typeof search === 'string' ? search : undefined,
 
       setId: typeof setId === 'string' ? Number(setId) : undefined,
 
       rarity: typeof rarity === 'string' ? rarity : undefined,
 
       category: typeof category === 'string' ? category : undefined,
-    };
 
+      number: typeof number === 'string' ? number : undefined,
+
+      artist: typeof artist === 'string' ? artist : undefined,
+
+      type: typeof type === 'string' ? type : undefined,
+
+      minHp: minHpValue,
+
+      maxHp: maxHpValue,
+    };
     const cards = await getAllCards(filters, currentPage, currentLimit);
 
     res.json(cards);

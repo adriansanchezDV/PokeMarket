@@ -1,5 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 
+import SellerProfile from './SellerProfileModel.js';
+
 import sequelize from '../config/database.js';
 
 class Product extends Model {
@@ -14,6 +16,7 @@ class Product extends Model {
   declare description: string | null;
   declare createdAt: Date;
   declare updatedAt: Date | null;
+  declare sellerProfile?: SellerProfile;
 }
 
 Product.init(

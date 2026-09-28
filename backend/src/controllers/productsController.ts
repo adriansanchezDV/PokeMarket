@@ -33,6 +33,24 @@ export const getProducts: RequestHandler = async (req, res, next) => {
 
     const maxPrice = req.query.maxPrice !== undefined ? Number(req.query.maxPrice) : undefined;
 
+    const search = typeof req.query.search === 'string' ? req.query.search : undefined;
+
+    const setId = req.query.setId !== undefined ? Number(req.query.setId) : undefined;
+
+    const rarity = typeof req.query.rarity === 'string' ? req.query.rarity : undefined;
+
+    const category = typeof req.query.category === 'string' ? req.query.category : undefined;
+
+    const number = typeof req.query.number === 'string' ? req.query.number : undefined;
+
+    const artist = typeof req.query.artist === 'string' ? req.query.artist : undefined;
+
+    const type = typeof req.query.type === 'string' ? req.query.type : undefined;
+
+    const minHp = req.query.minHp !== undefined ? Number(req.query.minHp) : undefined;
+
+    const maxHp = req.query.maxHp !== undefined ? Number(req.query.maxHp) : undefined;
+
     if (!Number.isInteger(page) || page < 1) {
       return res.status(400).json({
         error: 'Page must be a positive integer',
@@ -57,6 +75,30 @@ export const getProducts: RequestHandler = async (req, res, next) => {
     ) {
       return res.status(400).json({
         error: 'sellerProfileId must be a positive integer',
+      });
+    }
+
+    if (setId !== undefined && (!Number.isInteger(setId) || setId < 1)) {
+      return res.status(400).json({
+        error: 'setId must be a positive integer',
+      });
+    }
+
+    if (minHp !== undefined && (!Number.isInteger(minHp) || minHp < 0)) {
+      return res.status(400).json({
+        error: 'minHp must be a non-negative integer',
+      });
+    }
+
+    if (maxHp !== undefined && (!Number.isInteger(maxHp) || maxHp < 0)) {
+      return res.status(400).json({
+        error: 'maxHp must be a non-negative integer',
+      });
+    }
+
+    if (minHp !== undefined && maxHp !== undefined && minHp > maxHp) {
+      return res.status(400).json({
+        error: 'minHp cannot be greater than maxHp',
       });
     }
 
@@ -97,6 +139,17 @@ export const getProducts: RequestHandler = async (req, res, next) => {
       language,
       minPrice,
       maxPrice,
+
+      search,
+      setId,
+      rarity,
+      category,
+      number,
+      artist,
+      type,
+      minHp,
+      maxHp,
+
       page,
       limit,
       sort: sort as (typeof allowedSorts)[number],
@@ -281,4 +334,3 @@ export const updateProductStatusController: RequestHandler = async (req, res, ne
     next(error);
   }
 };
-

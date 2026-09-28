@@ -18,36 +18,34 @@ export const getSellerStats = async (userId: number) => {
     },
   });
 
-const orderItems = await OrderItem.findAll({
-  where: {
-    sellerProfileId: sellerProfile.id,
-    status: {
-      [Op.not]: 'cancelled',
+  const orderItems = await OrderItem.findAll({
+    where: {
+      sellerProfileId: sellerProfile.id,
+      status: {
+        [Op.not]: 'cancelled',
+      },
     },
-  },
-});
+  });
 
-const startOfMonth = new Date();
-startOfMonth.setDate(1);
-startOfMonth.setHours(0, 0, 0, 0);
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
 
-const monthOrderItems = orderItems.filter(
-  (item) => item.createdAt >= startOfMonth,
-);
+  const monthOrderItems = orderItems.filter((item) => item.createdAt >= startOfMonth);
 
-const recentOrders = await OrderItem.findAll({
-  where: {
-    sellerProfileId: sellerProfile.id,
-  },
-  include: [
-    {
-      association: 'order',
-      attributes: ['id', 'status', ['created_at', 'createdAt']],
+  const recentOrders = await OrderItem.findAll({
+    where: {
+      sellerProfileId: sellerProfile.id,
     },
-  ],
-  order: [[col('OrderItem.created_at'), 'DESC']],
-  limit: 5,
-});
+    include: [
+      {
+        association: 'order',
+        attributes: ['id', 'status', ['created_at', 'createdAt']],
+      },
+    ],
+    order: [[col('OrderItem.created_at'), 'DESC']],
+    limit: 5,
+  });
 
   return {
     products: {
@@ -66,37 +64,28 @@ const recentOrders = await OrderItem.findAll({
     },
 
     sales: {
-  totalItems: orderItems
-    .filter((item) => item.status !== 'cancelled')
-    .reduce((total, item) => total + item.quantity, 0),
+      totalItems: orderItems
+        .filter((item) => item.status !== 'cancelled')
+        .reduce((total, item) => total + item.quantity, 0),
 
-  totalRevenue: orderItems
-    .filter((item) => item.status !== 'cancelled')
-    .reduce(
-      (total, item) => total + Number(item.unitPrice) * item.quantity,
-      0,
-    )
-    .toFixed(2),
+      totalRevenue: orderItems
+        .filter((item) => item.status !== 'cancelled')
+        .reduce((total, item) => total + Number(item.unitPrice) * item.quantity, 0)
+        .toFixed(2),
 
-  thisMonthItems: monthOrderItems.reduce(
-    (total, item) => total + item.quantity,
-    0,
-  ),
+      thisMonthItems: monthOrderItems.reduce((total, item) => total + item.quantity, 0),
 
-  thisMonthRevenue: monthOrderItems
-    .reduce(
-      (total, item) => total + Number(item.unitPrice) * item.quantity,
-      0,
-    )
-    .toFixed(2),
-},
-recentOrders: recentOrders.map((item) => ({
-  orderId: item.orderId,
-  productName: item.productName,
-  quantity: item.quantity,
-  unitPrice: item.unitPrice,
-  status: item.status,
-  createdAt: item.createdAt,
-})),
+      thisMonthRevenue: monthOrderItems
+        .reduce((total, item) => total + Number(item.unitPrice) * item.quantity, 0)
+        .toFixed(2),
+    },
+    recentOrders: recentOrders.map((item) => ({
+      orderId: item.orderId,
+      productName: item.productName,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      status: item.status,
+      createdAt: item.createdAt,
+    })),
   };
 };

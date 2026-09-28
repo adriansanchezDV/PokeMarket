@@ -7,11 +7,6 @@ import { getSellerStatsController } from '../controllers/sellerStatsController.j
 
 const router = Router();
 
-router.get(
-  '/',
-  auth,
-  requireRole('seller'),
-  getSellerStatsController,
-);
+router.get('/', auth, requireRole('seller'), getSellerStatsController);
 
 export default router;

@@ -2,7 +2,6 @@ import { col, Op } from 'sequelize';
 import Product from '../models/ProductModel.js';
 import Card from '../models/CardModel.js';
 import SellerProfile from '../models/SellerProfileModel.js';
-import OrderItem from '../models/OrderItemModel.js';
 
 export const getAllProducts = async (filters: {
   cardId?: number;
@@ -11,6 +10,17 @@ export const getAllProducts = async (filters: {
   language?: string;
   minPrice?: number;
   maxPrice?: number;
+
+  search?: string;
+  setId?: number;
+  rarity?: string;
+  category?: string;
+  number?: string;
+  artist?: string;
+  type?: string;
+  minHp?: number;
+  maxHp?: number;
+
   page: number;
   limit: number;
   sort: 'id' | 'price' | 'stock' | 'createdAt';
@@ -23,6 +33,17 @@ export const getAllProducts = async (filters: {
     language,
     minPrice,
     maxPrice,
+
+    search,
+    setId,
+    rarity,
+    category,
+    number,
+    artist,
+    type,
+    minHp,
+    maxHp,
+
     page,
     limit,
     sort,
@@ -32,6 +53,53 @@ export const getAllProducts = async (filters: {
   const where: Record<string, unknown> = {
     isActive: true,
   };
+
+  const cardWhere: Record<string | symbol, unknown> = {};
+
+  if (search) {
+    cardWhere[Op.or] = [
+      { name: { [Op.iLike]: `%${search}%` } },
+      { number: { [Op.iLike]: `%${search}%` } },
+      { artist: { [Op.iLike]: `%${search}%` } },
+      { description: { [Op.iLike]: `%${search}%` } },
+    ];
+  }
+
+  if (setId !== undefined) cardWhere.setId = setId;
+  if (rarity) cardWhere.rarity = rarity;
+  if (category) cardWhere.category = category;
+
+  if (number) {
+    cardWhere.number = {
+      [Op.iLike]: `%${number}%`,
+    };
+  }
+
+  if (artist) {
+    cardWhere.artist = {
+      [Op.iLike]: `%${artist}%`,
+    };
+  }
+
+  if (type) {
+    cardWhere.types = {
+      [Op.contains]: [type],
+    };
+  }
+
+  if (minHp !== undefined && maxHp !== undefined) {
+    cardWhere.hp = {
+      [Op.between]: [minHp, maxHp],
+    };
+  } else if (minHp !== undefined) {
+    cardWhere.hp = {
+      [Op.gte]: minHp,
+    };
+  } else if (maxHp !== undefined) {
+    cardWhere.hp = {
+      [Op.lte]: maxHp,
+    };
+  }
   if (cardId !== undefined) {
     where.cardId = cardId;
   }
@@ -77,7 +145,20 @@ export const getAllProducts = async (filters: {
       {
         model: Card,
         as: 'card',
-        attributes: ['id', 'name', 'number', 'rarity', 'imageUrl'],
+        attributes: [
+          'id',
+          'name',
+          'number',
+          'rarity',
+          'imageUrl',
+          'artist',
+          'category',
+          'hp',
+          'types',
+          'setId',
+        ],
+        where: Object.keys(cardWhere).length ? cardWhere : undefined,
+        required: Object.keys(cardWhere).length > 0,
       },
       {
         model: SellerProfile,
@@ -260,4 +341,3 @@ export const updateProductStatus = async (
     ],
   });
 };
-

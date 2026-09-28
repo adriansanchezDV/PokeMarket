@@ -25,7 +25,6 @@ router.get('/', getProducts);
 
 router.post('/', auth, requireRole('seller'), validate(createProductSchema), createSingleProduct);
 
-
 router.get('/seller', auth, requireRole('seller'), getSellerProductsController);
 
 router.patch(

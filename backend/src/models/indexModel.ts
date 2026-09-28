@@ -28,7 +28,7 @@ Set.hasMany(Card, {
 
 Card.belongsTo(Set, {
   foreignKey: 'setId',
-  as: 'set',
+  as: 'cardSet',
 });
 
 // SellerProfile <-> Product
