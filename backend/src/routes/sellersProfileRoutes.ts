@@ -7,10 +7,9 @@ import {
 } from '../controllers/sellerProfilesController.js';
 
 import auth from '../middleware/auth.js';
-
 import validate from '../middleware/validate.js';
-
 import requireRole from '../middleware/requireRole.js';
+
 import {
   createSellerProfileSchema,
   updateSellerProfileSchema,
@@ -21,7 +20,6 @@ const router = Router();
 router.post(
   '/profile',
   auth,
-  requireRole('seller'),
   validate(createSellerProfileSchema),
   createSellerProfile,
 );

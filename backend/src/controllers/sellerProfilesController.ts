@@ -1,43 +1,57 @@
 import type { Request, Response, NextFunction } from 'express';
 
-import { SellerProfile } from '../models/indexModel.js';
+import {
+  createSellerProfile as createSellerProfileService,
+  getSellerProfile as getSellerProfileService,
+  updateSellerProfile as updateSellerProfileService,
+} from '../services/sellerProfileService.js';
 
-export const createSellerProfile = async (req: Request, res: Response, next: NextFunction) => {
+import { generateAuthToken } from '../services/authService.js';
+
+export const createSellerProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { storeName, description } = req.body;
 
-    const existingProfile = await SellerProfile.findOne({
-      where: {
-        userId: req.user!.id,
-      },
-    });
-
-    if (existingProfile) {
-      return res.status(409).json({
-        error: 'Seller profile already exists',
-      });
-    }
-
-    const profile = await SellerProfile.create({
-      userId: req.user!.id,
+    const { user, profile } = await createSellerProfileService(
+      req.user!.id,
       storeName,
-      description: description ?? null,
-    });
+      description,
+    );
+
+    const token = generateAuthToken(user);
 
     res.status(201).json({
-      id: profile.id,
-      userId: profile.userId,
-      storeName: profile.storeName,
-      description: profile.description,
-      createdAt: profile.createdAt,
-      updatedAt: profile.updatedAt,
+      token,
+      user: {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+      },
+      store: {
+        id: profile.id,
+        userId: profile.userId,
+        storeName: profile.storeName,
+        description: profile.description,
+        isActive: profile.isActive,
+        createdAt: profile.createdAt,
+        updatedAt: profile.updatedAt,
+      },
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const getSellerProfile = async (req: Request, res: Response, next: NextFunction) => {
+export const getSellerProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const id = Number(req.params.id);
 
@@ -47,15 +61,7 @@ export const getSellerProfile = async (req: Request, res: Response, next: NextFu
       });
     }
 
-    const profile = await SellerProfile.findByPk(id, {
-      attributes: ['id', 'storeName', 'description', 'createdAt', 'updatedAt'],
-      include: [
-        {
-          association: 'user',
-          attributes: ['id', 'fullName'],
-        },
-      ],
-    });
+    const profile = await getSellerProfileService(id);
 
     if (!profile) {
       return res.status(404).json({
@@ -69,51 +75,26 @@ export const getSellerProfile = async (req: Request, res: Response, next: NextFu
   }
 };
 
-export const updateSellerProfile = async (req: Request, res: Response, next: NextFunction) => {
+export const updateSellerProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const profile = await SellerProfile.findOne({
-      where: {
-        userId: req.user!.id,
-      },
-    });
-
-    if (!profile) {
-      return res.status(404).json({
-        error: 'Seller profile not found',
-      });
-    }
-
     const { storeName, description } = req.body;
 
-    if (storeName !== undefined && storeName !== profile.storeName) {
-      const existingProfile = await SellerProfile.findOne({
-        where: {
-          storeName,
-        },
-      });
-
-      if (existingProfile) {
-        return res.status(409).json({
-          error: 'Store name already registered',
-        });
-      }
-    }
-
-    if (storeName !== undefined) {
-      profile.storeName = storeName;
-    }
-
-    if (description !== undefined) {
-      profile.description = description;
-    }
-
-    await profile.save();
+    const profile = await updateSellerProfileService(
+      req.user!.id,
+      storeName,
+      description,
+    );
 
     res.json({
       id: profile.id,
       userId: profile.userId,
       storeName: profile.storeName,
       description: profile.description,
+      isActive: profile.isActive,
       createdAt: profile.createdAt,
       updatedAt: profile.updatedAt,
     });

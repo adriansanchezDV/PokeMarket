@@ -9,6 +9,7 @@ class SellerProfile extends Model {
   declare description: string | null;
   declare createdAt: Date;
   declare updatedAt: Date | null;
+  declare isActive: boolean;
 }
 
 SellerProfile.init(
@@ -49,6 +50,12 @@ SellerProfile.init(
       allowNull: false,
       field: 'updated_at',
     },
+    isActive: {
+  type: DataTypes.BOOLEAN,
+  allowNull: false,
+  defaultValue: true,
+  field: 'is_active',
+},
   },
   {
     sequelize,

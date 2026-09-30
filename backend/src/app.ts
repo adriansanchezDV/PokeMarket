@@ -13,6 +13,7 @@ import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import sellerOrderRoutes from './routes/sellerOrderRoutes.js';
 import sellerStatsRoutes from './routes/sellerStatsRoutes.js';
+import storeRoutes from './routes/storeRoutes.js';
 const app = express();
 
 app.use(cors());
@@ -29,6 +30,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/seller/orders', sellerOrderRoutes);
 app.use('/api/seller/stats', sellerStatsRoutes);
+app.use('/api/stores', storeRoutes);
 
 app.get('/api/ping', (_req, res) => {
   res.json({ message: 'pong' });
