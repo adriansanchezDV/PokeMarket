@@ -8,6 +8,7 @@ import Product from './ProductModel.js';
 import SellerProfile from './SellerProfileModel.js';
 import User from './UserModel.js';
 import Set from './SetModel.js';
+import Review from './ReviewModel.js';
 
 // User <-> SellerProfile
 User.hasOne(SellerProfile, {
@@ -153,4 +154,24 @@ Favorite.belongsTo(Product, {
   as: 'product',
 });
 
-export { User, SellerProfile, Set, Card, Product, Cart, CartItem, Order, OrderItem, Favorite };
+User.hasMany(Review, {
+  foreignKey: 'userId',
+  as: 'reviews',
+});
+
+Review.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+Product.hasMany(Review, {
+  foreignKey: 'productId',
+  as: 'reviews',
+});
+
+Review.belongsTo(Product, {
+  foreignKey: 'productId',
+  as: 'product',
+});
+
+export { User, SellerProfile, Set, Card, Product, Cart, CartItem, Order, OrderItem, Favorite, Review };

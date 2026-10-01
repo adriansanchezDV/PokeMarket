@@ -5,10 +5,11 @@ import {
   Product,
   Card,
   OrderItem,
+  Review,
 } from '../models/indexModel.js';
 
 const getStoreStats = async (storeId: number) => {
-  const [productCount, salesItems] = await Promise.all([
+  const [productCount, salesItems, reviews] = await Promise.all([
     Product.count({
       where: {
         sellerProfileId: storeId,
@@ -25,6 +26,20 @@ const getStoreStats = async (storeId: number) => {
       },
       attributes: ['quantity'],
     }),
+
+    Review.findAll({
+      include: [
+        {
+          model: Product,
+          as: 'product',
+          where: {
+            sellerProfileId: storeId,
+          },
+          attributes: [],
+        },
+      ],
+      attributes: ['rating'],
+    }),
   ]);
 
   const salesCount = salesItems.reduce(
@@ -32,9 +47,19 @@ const getStoreStats = async (storeId: number) => {
     0,
   );
 
+  const reviewCount = reviews.length;
+
+  const averageRating =
+    reviewCount > 0
+      ? reviews.reduce((sum, review) => sum + review.rating, 0) /
+        reviewCount
+      : 0;
+
   return {
     productCount,
     salesCount,
+    averageRating: Number(averageRating.toFixed(2)),
+    reviewCount,
   };
 };
 
@@ -137,3 +162,4 @@ export const getStoreProducts = async (storeId: number) => {
   order: [[col('Product.created_at'), 'DESC']],
 });
 };
+
