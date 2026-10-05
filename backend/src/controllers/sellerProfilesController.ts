@@ -8,11 +8,7 @@ import {
 
 import { generateAuthToken } from '../services/authService.js';
 
-export const createSellerProfile = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const createSellerProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { storeName, description } = req.body;
 
@@ -47,11 +43,7 @@ export const createSellerProfile = async (
   }
 };
 
-export const getSellerProfile = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getSellerProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
 
@@ -75,19 +67,11 @@ export const getSellerProfile = async (
   }
 };
 
-export const updateSellerProfile = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const updateSellerProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { storeName, description } = req.body;
 
-    const profile = await updateSellerProfileService(
-      req.user!.id,
-      storeName,
-      description,
-    );
+    const profile = await updateSellerProfileService(req.user!.id, storeName, description);
 
     res.json({
       id: profile.id,

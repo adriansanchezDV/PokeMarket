@@ -1,10 +1,6 @@
 import { Router } from 'express';
 
-import {
-  getStores,
-  getStoreById,
-  getStoreProducts,
-} from '../controllers/storeController.js';
+import { getStores, getStoreById, getStoreProducts } from '../controllers/storeController.js';
 
 const router = Router();
 

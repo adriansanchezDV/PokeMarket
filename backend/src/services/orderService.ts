@@ -1,17 +1,17 @@
 import { col } from 'sequelize';
 import sequelize from '../config/database.js';
 import Cart from '../models/CartModel.js';
-import { Card, CartItem, Order, OrderItem, Product, SellerProfile } from '../models/indexModel.js';
+import {
+  Card,
+  CartItem,
+  Order,
+  OrderItem,
+  Product,
+  SellerProfile,
+  ShippingAddress,
+} from '../models/indexModel.js';
 
-export const createOrder = async (
-  userId: number,
-  shippingAddress: {
-    street: string;
-    city: string;
-    postalCode: string;
-    country: string;
-  },
-) => {
+export const createOrder = async (userId: number, shippingAddressId: number) => {
   return sequelize.transaction(async (transaction) => {
     const cart = await Cart.findOne({
       where: { userId },
@@ -50,6 +50,19 @@ export const createOrder = async (
       throw new Error('Cart is empty');
     }
 
+    // Comprobamos que la dirección existe y pertenece al usuario
+    const shippingAddress = await ShippingAddress.findOne({
+      where: {
+        id: shippingAddressId,
+        userId,
+      },
+      transaction,
+    });
+
+    if (!shippingAddress) {
+      throw new Error('Shipping address not found');
+    }
+
     let total = 0;
 
     for (const item of items) {
@@ -66,12 +79,22 @@ export const createOrder = async (
       total += Number(product.price) * item.quantity;
     }
 
+    // Guardamos una copia de la dirección.
+    // El pedido no depende de la dirección guardada después de crearse.
     const order = await Order.create(
       {
         userId,
         status: 'pending',
         total: total.toFixed(2),
-        shippingAddress,
+        shippingAddress: {
+          recipientName: shippingAddress.recipientName,
+          street: shippingAddress.street,
+          city: shippingAddress.city,
+          postalCode: shippingAddress.postalCode,
+          province: shippingAddress.province,
+          country: shippingAddress.country,
+          phone: shippingAddress.phone,
+        },
       },
       { transaction },
     );

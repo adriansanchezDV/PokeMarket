@@ -1,12 +1,6 @@
 import { col, Op } from 'sequelize';
 
-import {
-  SellerProfile,
-  Product,
-  Card,
-  OrderItem,
-  Review,
-} from '../models/indexModel.js';
+import { SellerProfile, Product, Card, OrderItem, Review } from '../models/indexModel.js';
 
 const getStoreStats = async (storeId: number) => {
   const [productCount, salesItems, reviews] = await Promise.all([
@@ -42,18 +36,12 @@ const getStoreStats = async (storeId: number) => {
     }),
   ]);
 
-  const salesCount = salesItems.reduce(
-    (total, item) => total + item.quantity,
-    0,
-  );
+  const salesCount = salesItems.reduce((total, item) => total + item.quantity, 0);
 
   const reviewCount = reviews.length;
 
   const averageRating =
-    reviewCount > 0
-      ? reviews.reduce((sum, review) => sum + review.rating, 0) /
-        reviewCount
-      : 0;
+    reviewCount > 0 ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount : 0;
 
   return {
     productCount,
@@ -65,13 +53,7 @@ const getStoreStats = async (storeId: number) => {
 
 export const getStores = async () => {
   const stores = await SellerProfile.findAll({
-    attributes: [
-      'id',
-      'storeName',
-      'description',
-      'isActive',
-      'createdAt',
-    ],
+    attributes: ['id', 'storeName', 'description', 'isActive', 'createdAt'],
     order: [['createdAt', 'DESC']],
   });
 
@@ -93,13 +75,7 @@ export const getStores = async () => {
 
 export const getStoreById = async (storeId: number) => {
   const store = await SellerProfile.findByPk(storeId, {
-    attributes: [
-      'id',
-      'storeName',
-      'description',
-      'isActive',
-      'createdAt',
-    ],
+    attributes: ['id', 'storeName', 'description', 'isActive', 'createdAt'],
   });
 
   if (!store) {
@@ -128,38 +104,37 @@ export const getStoreProducts = async (storeId: number) => {
   }
 
   return Product.findAll({
-  where: {
-    sellerProfileId: storeId,
-    isActive: true,
-  },
-  attributes: [
-    'id',
-    'condition',
-    'language',
-    'price',
-    'stock',
-    'isActive',
-    'description',
-    [col('Product.created_at'), 'createdAt'],
-  ],
-  include: [
-    {
-      model: Card,
-      as: 'card',
-      attributes: [
-        'id',
-        'name',
-        'number',
-        'rarity',
-        'imageUrl',
-        'category',
-        'hp',
-        'artist',
-        'types',
-      ],
+    where: {
+      sellerProfileId: storeId,
+      isActive: true,
     },
-  ],
-  order: [[col('Product.created_at'), 'DESC']],
-});
+    attributes: [
+      'id',
+      'condition',
+      'language',
+      'price',
+      'stock',
+      'isActive',
+      'description',
+      [col('Product.created_at'), 'createdAt'],
+    ],
+    include: [
+      {
+        model: Card,
+        as: 'card',
+        attributes: [
+          'id',
+          'name',
+          'number',
+          'rarity',
+          'imageUrl',
+          'category',
+          'hp',
+          'artist',
+          'types',
+        ],
+      },
+    ],
+    order: [[col('Product.created_at'), 'DESC']],
+  });
 };
-

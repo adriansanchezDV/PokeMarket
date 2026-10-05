@@ -2,16 +2,9 @@ import bcrypt from 'bcrypt';
 import type { Request, Response, NextFunction } from 'express';
 
 import { User } from '../models/indexModel.js';
-import {
-  authenticateUser,
-  generateAuthToken,
-} from '../services/authService.js';
+import { authenticateUser, generateAuthToken } from '../services/authService.js';
 
-export const register = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { fullName, email, password } = req.body;
 
@@ -50,11 +43,7 @@ export const register = async (
   }
 };
 
-export const login = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
 

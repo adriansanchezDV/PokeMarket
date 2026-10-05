@@ -6,11 +6,7 @@ import {
   getStoreProducts as getStoreProductsService,
 } from '../services/storeService.js';
 
-export const getStores = async (
-  _req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getStores = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const stores = await getStoresService();
 
@@ -20,11 +16,7 @@ export const getStores = async (
   }
 };
 
-export const getStoreById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getStoreById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
 
@@ -48,11 +40,7 @@ export const getStoreById = async (
   }
 };
 
-export const getStoreProducts = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getStoreProducts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
 

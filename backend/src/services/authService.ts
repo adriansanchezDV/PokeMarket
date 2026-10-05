@@ -22,9 +22,7 @@ export const authenticateUser = async (email: string, password: string) => {
   return user;
 };
 
-export const generateAuthToken = (
-  user: User,
-): string => {
+export const generateAuthToken = (user: User): string => {
   return jwt.sign(
     {
       id: user.id,

@@ -51,11 +51,11 @@ SellerProfile.init(
       field: 'updated_at',
     },
     isActive: {
-  type: DataTypes.BOOLEAN,
-  allowNull: false,
-  defaultValue: true,
-  field: 'is_active',
-},
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+      field: 'is_active',
+    },
   },
   {
     sequelize,

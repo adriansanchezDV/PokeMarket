@@ -4,15 +4,11 @@ import {
   createReview as createReviewService,
   getProductReviews as getProductReviewsService,
   updateReview as updateReviewService,
-  deleteReview as deleteReviewService
+  deleteReview as deleteReviewService,
 } from '../services/reviewService.js';
 import { getProductReviewsSchema } from '../schemas/reviewSchema.js';
 
-export const createReview = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const createReview = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user!.id;
     const productId = Number(req.params.productId);
@@ -25,12 +21,7 @@ export const createReview = async (
 
     const { rating, comment } = req.body;
 
-    const review = await createReviewService(
-      userId,
-      productId,
-      rating,
-      comment,
-    );
+    const review = await createReviewService(userId, productId, rating, comment);
 
     return res.status(201).json(review);
   } catch (error) {
@@ -38,11 +29,7 @@ export const createReview = async (
   }
 };
 
-export const getProductReviews = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getProductReviews = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const productId = Number(req.params.productId);
 
@@ -56,12 +43,7 @@ export const getProductReviews = async (
 
     const userId = req.user?.id;
 
-    const result = await getProductReviewsService(
-  productId,
-  page,
-  limit,
-  userId,
-);
+    const result = await getProductReviewsService(productId, page, limit, userId);
 
     return res.json(result);
   } catch (error) {
@@ -69,11 +51,7 @@ export const getProductReviews = async (
   }
 };
 
-export const updateReview = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const updateReview = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user!.id;
     const productId = Number(req.params.productId);
@@ -93,13 +71,7 @@ export const updateReview = async (
 
     const { rating, comment } = req.body;
 
-    const review = await updateReviewService(
-      userId,
-      productId,
-      reviewId,
-      rating,
-      comment,
-    );
+    const review = await updateReviewService(userId, productId, reviewId, rating, comment);
 
     return res.json(review);
   } catch (error) {
@@ -107,12 +79,7 @@ export const updateReview = async (
   }
 };
 
-
-export const deleteReview = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const deleteReview = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user!.id;
     const productId = Number(req.params.productId);

@@ -8,10 +8,13 @@ class Order extends Model {
   declare status: 'pending' | 'paid' | 'completed' | 'cancelled';
   declare total: string;
   declare shippingAddress: {
+    recipientName: string;
     street: string;
     city: string;
     postalCode: string;
+    province: string;
     country: string;
+    phone: string;
   };
   declare createdAt: Date;
   declare updatedAt: Date | null;

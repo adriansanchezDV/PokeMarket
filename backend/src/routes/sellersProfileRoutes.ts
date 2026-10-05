@@ -17,12 +17,7 @@ import {
 
 const router = Router();
 
-router.post(
-  '/profile',
-  auth,
-  validate(createSellerProfileSchema),
-  createSellerProfile,
-);
+router.post('/profile', auth, validate(createSellerProfileSchema), createSellerProfile);
 
 router.patch(
   '/profile',

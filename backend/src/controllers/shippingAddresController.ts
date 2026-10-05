@@ -9,11 +9,7 @@ import {
   updateShippingAddress,
 } from '../services/shippingAddressService.js';
 
-export const getShippingAddresses: RequestHandler = async (
-  req,
-  res,
-  next,
-) => {
+export const getShippingAddresses: RequestHandler = async (req, res, next) => {
   try {
     const addresses = await getUserShippingAddresses(req.user!.id);
 
@@ -23,11 +19,7 @@ export const getShippingAddresses: RequestHandler = async (
   }
 };
 
-export const getShippingAddress: RequestHandler = async (
-  req,
-  res,
-  next,
-) => {
+export const getShippingAddress: RequestHandler = async (req, res, next) => {
   try {
     const addressId = Number(req.params.id);
 
@@ -37,10 +29,7 @@ export const getShippingAddress: RequestHandler = async (
       });
     }
 
-    const address = await getShippingAddressById(
-      req.user!.id,
-      addressId,
-    );
+    const address = await getShippingAddressById(req.user!.id, addressId);
 
     if (!address) {
       return res.status(404).json({
@@ -54,16 +43,9 @@ export const getShippingAddress: RequestHandler = async (
   }
 };
 
-export const createNewShippingAddress: RequestHandler = async (
-  req,
-  res,
-  next,
-) => {
+export const createNewShippingAddress: RequestHandler = async (req, res, next) => {
   try {
-    const address = await createShippingAddress(
-      req.user!.id,
-      req.body,
-    );
+    const address = await createShippingAddress(req.user!.id, req.body);
 
     return res.status(201).json(address);
   } catch (error) {
@@ -71,11 +53,7 @@ export const createNewShippingAddress: RequestHandler = async (
   }
 };
 
-export const updateExistingShippingAddress: RequestHandler = async (
-  req,
-  res,
-  next,
-) => {
+export const updateExistingShippingAddress: RequestHandler = async (req, res, next) => {
   try {
     const addressId = Number(req.params.id);
 
@@ -85,11 +63,7 @@ export const updateExistingShippingAddress: RequestHandler = async (
       });
     }
 
-    const address = await updateShippingAddress(
-      req.user!.id,
-      addressId,
-      req.body,
-    );
+    const address = await updateShippingAddress(req.user!.id, addressId, req.body);
 
     return res.status(200).json(address);
   } catch (error) {
@@ -105,11 +79,7 @@ export const updateExistingShippingAddress: RequestHandler = async (
   }
 };
 
-export const deleteExistingShippingAddress: RequestHandler = async (
-  req,
-  res,
-  next,
-) => {
+export const deleteExistingShippingAddress: RequestHandler = async (req, res, next) => {
   try {
     const addressId = Number(req.params.id);
 
@@ -119,10 +89,7 @@ export const deleteExistingShippingAddress: RequestHandler = async (
       });
     }
 
-    const address = await deleteShippingAddress(
-      req.user!.id,
-      addressId,
-    );
+    const address = await deleteShippingAddress(req.user!.id, addressId);
 
     return res.status(200).json({
       message: 'Shipping address deleted',
@@ -141,32 +108,28 @@ export const deleteExistingShippingAddress: RequestHandler = async (
   }
 };
 
-export const setDefaultShippingAddressController: RequestHandler =
-  async (req, res, next) => {
-    try {
-      const addressId = Number(req.params.id);
+export const setDefaultShippingAddressController: RequestHandler = async (req, res, next) => {
+  try {
+    const addressId = Number(req.params.id);
 
-      if (!Number.isInteger(addressId) || addressId <= 0) {
-        return res.status(400).json({
-          error: 'Invalid shipping address id',
+    if (!Number.isInteger(addressId) || addressId <= 0) {
+      return res.status(400).json({
+        error: 'Invalid shipping address id',
+      });
+    }
+
+    const address = await setDefaultShippingAddress(req.user!.id, addressId);
+
+    return res.status(200).json(address);
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message === 'Shipping address not found') {
+        return res.status(404).json({
+          error: error.message,
         });
       }
-
-      const address = await setDefaultShippingAddress(
-        req.user!.id,
-        addressId,
-      );
-
-      return res.status(200).json(address);
-    } catch (error) {
-      if (error instanceof Error) {
-        if (error.message === 'Shipping address not found') {
-          return res.status(404).json({
-            error: error.message,
-          });
-        }
-      }
-
-      next(error);
     }
-  };
+
+    next(error);
+  }
+};

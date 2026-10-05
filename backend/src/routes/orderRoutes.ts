@@ -4,7 +4,13 @@ import auth from '../middleware/auth.js';
 
 import validate from '../middleware/validate.js';
 import { createOrderSchema } from '../schemas/orderSchema.js';
-import { cancelOrderController, createNewOrder, getOrder, getOrders, payOrderController } from '../controllers/ordersController.js';
+import {
+  cancelOrderController,
+  createNewOrder,
+  getOrder,
+  getOrders,
+  payOrderController,
+} from '../controllers/ordersController.js';
 
 const router = Router();
 

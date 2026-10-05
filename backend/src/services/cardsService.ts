@@ -169,24 +169,24 @@ export const getCardById = async (id: number) => {
     products: cardData.products
       .sort((a: Product, b: Product) => Number(a.price) - Number(b.price))
       .map((product: Product) => {
-  if (!product.sellerProfile) {
-    throw new Error(`Seller profile not found for product ${product.id}`);
-  }
+        if (!product.sellerProfile) {
+          throw new Error(`Seller profile not found for product ${product.id}`);
+        }
 
-  return {
-    id: product.id,
-    condition: product.condition,
-    language: product.language,
-    price: product.price,
-    stock: product.stock,
-    description: product.description,
+        return {
+          id: product.id,
+          condition: product.condition,
+          language: product.language,
+          price: product.price,
+          stock: product.stock,
+          description: product.description,
 
-    seller: {
-      id: product.sellerProfile.id,
-      storeName: product.sellerProfile.storeName,
-      description: product.sellerProfile.description,
-    },
-  };
-})
+          seller: {
+            id: product.sellerProfile.id,
+            storeName: product.sellerProfile.storeName,
+            description: product.sellerProfile.description,
+          },
+        };
+      }),
   };
 };

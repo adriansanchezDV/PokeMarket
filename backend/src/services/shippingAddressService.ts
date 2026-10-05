@@ -3,7 +3,6 @@ import { col, Op } from 'sequelize';
 import sequelize from '../config/database.js';
 import ShippingAddress from '../models/ShippingAdressModel.js';
 
-
 type ShippingAddressData = {
   recipientName: string;
   street: string;
@@ -25,10 +24,7 @@ export const getUserShippingAddresses = async (userId: number) => {
   });
 };
 
-export const getShippingAddressById = async (
-  userId: number,
-  addressId: number,
-) => {
+export const getShippingAddressById = async (userId: number, addressId: number) => {
   return ShippingAddress.findOne({
     where: {
       id: addressId,
@@ -37,10 +33,7 @@ export const getShippingAddressById = async (
   });
 };
 
-export const createShippingAddress = async (
-  userId: number,
-  data: ShippingAddressData,
-) => {
+export const createShippingAddress = async (userId: number, data: ShippingAddressData) => {
   return sequelize.transaction(async (transaction) => {
     const shouldBeDefault =
       data.isDefault === true ||
@@ -116,10 +109,7 @@ export const updateShippingAddress = async (
   });
 };
 
-export const deleteShippingAddress = async (
-  userId: number,
-  addressId: number,
-) => {
+export const deleteShippingAddress = async (userId: number, addressId: number) => {
   return sequelize.transaction(async (transaction) => {
     const address = await ShippingAddress.findOne({
       where: {
@@ -140,11 +130,11 @@ export const deleteShippingAddress = async (
 
     if (wasDefault) {
       const nextAddress = await ShippingAddress.findOne({
-  where: { userId },
-  order: [[col('created_at'), 'ASC']],
-  transaction,
-  lock: transaction.LOCK.UPDATE,
-});
+        where: { userId },
+        order: [[col('created_at'), 'ASC']],
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
 
       if (nextAddress) {
         nextAddress.isDefault = true;
@@ -156,10 +146,7 @@ export const deleteShippingAddress = async (
   });
 };
 
-export const setDefaultShippingAddress = async (
-  userId: number,
-  addressId: number,
-) => {
+export const setDefaultShippingAddress = async (userId: number, addressId: number) => {
   return sequelize.transaction(async (transaction) => {
     const address = await ShippingAddress.findOne({
       where: {

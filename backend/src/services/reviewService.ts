@@ -1,5 +1,3 @@
-
-
 import { Order, OrderItem, Product, Review, User } from '../models/indexModel.js';
 import { AppError } from '../utils/AppError.js';
 
@@ -33,10 +31,7 @@ export const createReview = async (
   });
 
   if (!purchasedProduct) {
-    throw new AppError(
-      403,
-      'You can only review products you have purchased',
-    );
+    throw new AppError(403, 'You can only review products you have purchased');
   }
 
   const existingReview = await Review.findOne({
@@ -57,7 +52,6 @@ export const createReview = async (
     comment: comment ?? null,
   });
 };
-
 
 export const getProductReviews = async (
   productId: number,
@@ -83,10 +77,7 @@ export const getProductReviews = async (
   const reviewCount = allReviews.length;
 
   const averageRating =
-    reviewCount > 0
-      ? allReviews.reduce((sum, review) => sum + review.rating, 0) /
-        reviewCount
-      : 0;
+    reviewCount > 0 ? allReviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount : 0;
 
   const ratingDistribution = {
     5: 0,
@@ -97,9 +88,7 @@ export const getProductReviews = async (
   };
 
   for (const review of allReviews) {
-    ratingDistribution[
-      review.rating as keyof typeof ratingDistribution
-    ]++;
+    ratingDistribution[review.rating as keyof typeof ratingDistribution]++;
   }
 
   const reviews = await Review.findAll({
@@ -113,36 +102,23 @@ export const getProductReviews = async (
         attributes: ['id', 'fullName'],
       },
     ],
-    attributes: [
-      'id',
-      'rating',
-      'comment',
-      'createdAt',
-      'updatedAt',
-    ],
+    attributes: ['id', 'rating', 'comment', 'createdAt', 'updatedAt'],
     order: [['createdAt', 'DESC']],
     limit,
     offset,
   });
 
-  const totalPages =
-    reviewCount > 0 ? Math.ceil(reviewCount / limit) : 0;
+  const totalPages = reviewCount > 0 ? Math.ceil(reviewCount / limit) : 0;
 
-    const userReview = userId
-  ? await Review.findOne({
-      where: {
-        productId,
-        userId,
-      },
-      attributes: [
-        'id',
-        'rating',
-        'comment',
-        'createdAt',
-        'updatedAt',
-      ],
-    })
-  : null;
+  const userReview = userId
+    ? await Review.findOne({
+        where: {
+          productId,
+          userId,
+        },
+        attributes: ['id', 'rating', 'comment', 'createdAt', 'updatedAt'],
+      })
+    : null;
 
   return {
     productId,
@@ -152,11 +128,10 @@ export const getProductReviews = async (
     page,
     limit,
     totalPages,
-     userReview,
+    userReview,
     reviews,
   };
 };
-
 
 export const updateReview = async (
   userId: number,
@@ -190,12 +165,7 @@ export const updateReview = async (
   return review;
 };
 
-
-export const deleteReview = async (
-  userId: number,
-  productId: number,
-  reviewId: number,
-) => {
+export const deleteReview = async (userId: number, productId: number, reviewId: number) => {
   const review = await Review.findOne({
     where: {
       id: reviewId,

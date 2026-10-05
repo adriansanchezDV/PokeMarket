@@ -46,5 +46,4 @@ export const createShippingAddressSchema = z.object({
   isDefault: z.boolean().optional(),
 });
 
-export const updateShippingAddressSchema =
-  createShippingAddressSchema.partial();
+export const updateShippingAddressSchema = createShippingAddressSchema.partial();

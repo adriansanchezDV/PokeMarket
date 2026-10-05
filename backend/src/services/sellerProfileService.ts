@@ -62,14 +62,7 @@ export const createSellerProfile = async (
 
 export const getSellerProfile = async (id: number) => {
   return SellerProfile.findByPk(id, {
-    attributes: [
-      'id',
-      'storeName',
-      'description',
-      'isActive',
-      'createdAt',
-      'updatedAt',
-    ],
+    attributes: ['id', 'storeName', 'description', 'isActive', 'createdAt', 'updatedAt'],
     include: [
       {
         association: 'user',

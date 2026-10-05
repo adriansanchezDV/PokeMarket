@@ -185,4 +185,17 @@ ShippingAddress.belongsTo(User, {
   as: 'user',
 });
 
-export { User, SellerProfile, Set, Card, Product, Cart, CartItem, Order, OrderItem, Favorite, Review, ShippingAddress };
+export {
+  User,
+  SellerProfile,
+  Set,
+  Card,
+  Product,
+  Cart,
+  CartItem,
+  Order,
+  OrderItem,
+  Favorite,
+  Review,
+  ShippingAddress,
+};
