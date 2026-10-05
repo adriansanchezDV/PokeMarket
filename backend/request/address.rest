@@ -1,0 +1,14 @@
+### Create first shipping address
+POST http://localhost:3001/api/shipping-addresses
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "recipientName": "Adrian Sánchez",
+  "street": "Calle Ejemplo 123",
+  "city": "Madrid",
+  "postalCode": "28001",
+  "province": "Madrid",
+  "country": "España",
+  "phone": "600123456"
+}

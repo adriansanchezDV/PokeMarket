@@ -1,15 +1,10 @@
 import { Router } from 'express';
 
 import auth from '../middleware/auth.js';
-import {
-  cancelOrderController,
-  createNewOrder,
-  getOrder,
-  getOrders,
-  payOrderController,
-} from '../controllers/orderController.js';
+
 import validate from '../middleware/validate.js';
 import { createOrderSchema } from '../schemas/orderSchema.js';
+import { cancelOrderController, createNewOrder, getOrder, getOrders, payOrderController } from '../controllers/ordersController.js';
 
 const router = Router();
 

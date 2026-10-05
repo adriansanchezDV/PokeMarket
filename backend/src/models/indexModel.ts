@@ -9,6 +9,7 @@ import SellerProfile from './SellerProfileModel.js';
 import User from './UserModel.js';
 import Set from './SetModel.js';
 import Review from './ReviewModel.js';
+import ShippingAddress from './ShippingAdressModel.js';
 
 // User <-> SellerProfile
 User.hasOne(SellerProfile, {
@@ -174,4 +175,14 @@ Review.belongsTo(Product, {
   as: 'product',
 });
 
-export { User, SellerProfile, Set, Card, Product, Cart, CartItem, Order, OrderItem, Favorite, Review };
+User.hasMany(ShippingAddress, {
+  foreignKey: 'userId',
+  as: 'shippingAddresses',
+});
+
+ShippingAddress.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+export { User, SellerProfile, Set, Card, Product, Cart, CartItem, Order, OrderItem, Favorite, Review, ShippingAddress };
