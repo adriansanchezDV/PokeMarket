@@ -2,8 +2,11 @@ import { col, Op } from 'sequelize';
 import Product from '../models/ProductModel.js';
 import Card from '../models/CardModel.js';
 import SellerProfile from '../models/SellerProfileModel.js';
+import Favorite from '../models/FavoriteModel.js';
 
 export const getAllProducts = async (filters: {
+  userId?: number;
+
   cardId?: number;
   sellerProfileId?: number;
   condition?: string;
@@ -27,6 +30,7 @@ export const getAllProducts = async (filters: {
   order: 'ASC' | 'DESC';
 }) => {
   const {
+    userId,
     cardId,
     sellerProfileId,
     condition,
@@ -171,8 +175,29 @@ export const getAllProducts = async (filters: {
     offset,
   });
 
+  const favoriteProductIds = new Set<number>();
+
+  if (userId !== undefined && rows.length > 0) {
+    const favorites = await Favorite.findAll({
+      where: {
+        userId,
+        productId: rows.map((product) => product.id),
+      },
+      attributes: ['productId'],
+    });
+
+    favorites.forEach((favorite) => {
+      favoriteProductIds.add(favorite.productId);
+    });
+  }
+
+  const data = rows.map((product) => ({
+    ...product.toJSON(),
+    isFavorite: favoriteProductIds.has(product.id),
+  }));
+
   return {
-    data: rows,
+    data,
     pagination: {
       page,
       limit,
@@ -182,8 +207,8 @@ export const getAllProducts = async (filters: {
   };
 };
 
-export const getProductById = async (id: number) => {
-  return Product.findByPk(id, {
+export const getProductById = async (id: number, userId?: number) => {
+  const product = await Product.findByPk(id, {
     include: [
       {
         model: Card,
@@ -197,6 +222,28 @@ export const getProductById = async (id: number) => {
       },
     ],
   });
+
+  if (!product) {
+    return null;
+  }
+
+  let isFavorite = false;
+
+  if (userId !== undefined) {
+    const favorite = await Favorite.findOne({
+      where: {
+        userId,
+        productId: id,
+      },
+    });
+
+    isFavorite = Boolean(favorite);
+  }
+
+  return {
+    ...product.toJSON(),
+    isFavorite,
+  };
 };
 
 export const createProduct = async (

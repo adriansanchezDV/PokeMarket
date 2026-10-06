@@ -18,10 +18,10 @@ import {
   updateProductSchema,
   updateProductStatusSchema,
 } from '../schemas/productsSchema.js';
+import optionalAuth from '../middleware/optionalAuth.js';
 
 const router = Router();
-
-router.get('/', getProducts);
+router.get('/', optionalAuth, getProducts);
 
 router.post('/', auth, requireRole('seller'), validate(createProductSchema), createSingleProduct);
 
@@ -43,6 +43,6 @@ router.patch(
   updateSingleProduct,
 );
 
-router.get('/:id', getSingleProduct);
+router.get('/:id', optionalAuth, getSingleProduct);
 
 export default router;

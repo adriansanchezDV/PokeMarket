@@ -5,14 +5,26 @@ import SellerProfile from '../models/SellerProfileModel.js';
 import { col } from 'sequelize';
 
 export const getUserFavorites = async (userId: number) => {
-  return Favorite.findAll({
+  const favorites = await Favorite.findAll({
     where: {
       userId,
     },
+    attributes: ['id', 'productId', [col('Favorite.created_at'), 'createdAt']],
     include: [
       {
         model: Product,
         as: 'product',
+        attributes: [
+          'id',
+          'sellerProfileId',
+          'cardId',
+          'condition',
+          'language',
+          'price',
+          'stock',
+          'isActive',
+          'description',
+        ],
         include: [
           {
             model: Card,
@@ -29,8 +41,29 @@ export const getUserFavorites = async (userId: number) => {
     ],
     order: [[col('Favorite.created_at'), 'DESC']],
   });
-};
 
+  return favorites.map((favorite) => {
+    const data = favorite.toJSON();
+
+    let availability: 'available' | 'out_of_stock' | 'inactive';
+
+    if (!data.product.isActive) {
+      availability = 'inactive';
+    } else if (data.product.stock <= 0) {
+      availability = 'out_of_stock';
+    } else {
+      availability = 'available';
+    }
+
+    return {
+      ...data,
+      product: {
+        ...data.product,
+        availability,
+      },
+    };
+  });
+};
 export const addFavorite = async (userId: number, productId: number) => {
   const product = await Product.findByPk(productId);
 

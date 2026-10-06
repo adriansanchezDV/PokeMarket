@@ -10,20 +10,16 @@ import {
 
 export const createNewOrder: RequestHandler = async (req, res, next) => {
   try {
-    const order = await createOrder(
-  req.user!.id,
-  req.body.shippingAddressId,
-);
+    const order = await createOrder(req.user!.id, req.body.shippingAddressId);
 
     return res.status(201).json(order);
   } catch (error) {
     if (error instanceof Error) {
-
       if (error.message === 'Shipping address not found') {
-  return res.status(404).json({
-    error: error.message,
-  });
-}
+        return res.status(404).json({
+          error: error.message,
+        });
+      }
       if (
         error.message === 'Cart not found' ||
         error.message === 'Cart is empty' ||
@@ -39,8 +35,6 @@ export const createNewOrder: RequestHandler = async (req, res, next) => {
           error: error.message,
         });
       }
-
-      
     }
 
     next(error);

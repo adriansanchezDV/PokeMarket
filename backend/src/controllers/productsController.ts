@@ -133,6 +133,8 @@ export const getProducts: RequestHandler = async (req, res, next) => {
     }
 
     const result = await getAllProducts({
+      userId: req.user?.id,
+
       cardId,
       sellerProfileId,
       condition,
@@ -161,7 +163,6 @@ export const getProducts: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
-
 export const getSingleProduct = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -173,7 +174,7 @@ export const getSingleProduct = async (req: Request, res: Response) => {
       return;
     }
 
-    const product = await getProductById(id);
+    const product = await getProductById(id, req.user?.id);
 
     if (!product) {
       res.status(404).json({
