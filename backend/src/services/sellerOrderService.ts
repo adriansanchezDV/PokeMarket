@@ -1,5 +1,6 @@
 import { col, Op } from 'sequelize';
 import { Order, OrderItem, SellerProfile } from '../models/indexModel.js';
+import { createNotification } from './notificationService.js';
 
 export const getSellerOrders = async (userId: number) => {
   const sellerProfile = await SellerProfile.findOne({
@@ -70,8 +71,26 @@ export const updateSellerOrderItemStatus = async (
 
   await orderItem.save();
 
+  if (newStatus === 'shipped') {
+    const order = orderItem.get('order') as Order;
+
+    await createNotification({
+      userId: order.userId,
+      type: 'ORDER_SHIPPED',
+      title: 'Pedido enviado',
+      message: `Tu pedido ha sido enviado.`,
+    });
+  }
+
   if (newStatus === 'delivered') {
     const order = orderItem.get('order') as Order;
+
+    await createNotification({
+      userId: order.userId,
+      type: 'ORDER_DELIVERED',
+      title: 'Pedido entregado',
+      message: 'Tu pedido ha sido entregado.',
+    });
 
     const remainingItems = await OrderItem.count({
       where: {

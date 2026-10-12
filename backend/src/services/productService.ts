@@ -3,6 +3,10 @@ import Product from '../models/ProductModel.js';
 import Card from '../models/CardModel.js';
 import SellerProfile from '../models/SellerProfileModel.js';
 import Favorite from '../models/FavoriteModel.js';
+import {
+  notifyFavoriteUsersAboutPriceDrop,
+  notifyFavoriteUsersAboutRestock,
+} from './notificationService.js';
 
 export const getAllProducts = async (filters: {
   userId?: number;
@@ -311,7 +315,21 @@ export const updateProduct = async (
     return null;
   }
 
+  const oldStock = product.stock;
+  const oldPrice = Number(product.price);
+
   await product.update(data);
+
+  const newStock = product.stock;
+  const newPrice = Number(product.price);
+
+  if (oldStock === 0 && newStock > 0) {
+    await notifyFavoriteUsersAboutRestock(product.id);
+  }
+
+  if (newPrice < oldPrice) {
+    await notifyFavoriteUsersAboutPriceDrop(product.id, oldPrice, newPrice);
+  }
 
   return Product.findByPk(product.id, {
     include: [

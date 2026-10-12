@@ -1,0 +1,3 @@
+### Obtener mis notificaciones
+GET http://localhost:3001/api/notifications
+Authorization: Bearer {{token}}

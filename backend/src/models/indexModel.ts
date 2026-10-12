@@ -10,6 +10,7 @@ import User from './UserModel.js';
 import Set from './SetModel.js';
 import Review from './ReviewModel.js';
 import ShippingAddress from './ShippingAdressModel.js';
+import Notification from './NotificationModel.js';
 
 // User <-> SellerProfile
 User.hasOne(SellerProfile, {
@@ -185,6 +186,30 @@ ShippingAddress.belongsTo(User, {
   as: 'user',
 });
 
+User.hasMany(Notification, {
+  foreignKey: 'userId',
+  as: 'notifications',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+Notification.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+User.hasMany(Notification, {
+  foreignKey: 'senderId',
+  as: 'sentNotifications',
+  onDelete: 'SET NULL',
+  onUpdate: 'CASCADE',
+});
+
+Notification.belongsTo(User, {
+  foreignKey: 'senderId',
+  as: 'sender',
+});
+
 export {
   User,
   SellerProfile,
@@ -198,4 +223,5 @@ export {
   Favorite,
   Review,
   ShippingAddress,
+  Notification,
 };

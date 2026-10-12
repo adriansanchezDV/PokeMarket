@@ -10,6 +10,7 @@ import {
   SellerProfile,
   ShippingAddress,
 } from '../models/indexModel.js';
+import { createNotification } from './notificationService.js';
 
 export const createOrder = async (userId: number, shippingAddressId: number) => {
   return sequelize.transaction(async (transaction) => {
@@ -175,6 +176,12 @@ export const payOrder = async (userId: number, orderId: number) => {
         {
           model: OrderItem,
           as: 'items',
+          include: [
+            {
+              model: SellerProfile,
+              as: 'sellerProfile',
+            },
+          ],
         },
       ],
       transaction,
@@ -222,6 +229,28 @@ export const payOrder = async (userId: number, orderId: number) => {
     for (const item of items) {
       item.status = 'processing';
       await item.save({ transaction });
+    }
+
+    const sellerUserIds = [
+      ...new Set(
+        items
+          .map((item) => {
+            const sellerProfile = item.get('sellerProfile') as SellerProfile;
+
+            return sellerProfile?.userId;
+          })
+          .filter((userId): userId is number => userId !== undefined),
+      ),
+    ];
+
+    for (const sellerUserId of sellerUserIds) {
+      await createNotification({
+        userId: sellerUserId,
+        type: 'NEW_SALE',
+        title: 'Nueva venta',
+        message: 'Has recibido una nueva venta.',
+        transaction,
+      });
     }
 
     return order;
@@ -278,6 +307,14 @@ export const cancelOrder = async (userId: number, orderId: number) => {
 
     order.status = 'cancelled';
     await order.save({ transaction });
+
+    await createNotification({
+      userId: order.userId,
+      type: 'ORDER_CANCELLED',
+      title: 'Pedido cancelado',
+      message: 'Tu pedido ha sido cancelado.',
+      transaction,
+    });
 
     return order;
   });

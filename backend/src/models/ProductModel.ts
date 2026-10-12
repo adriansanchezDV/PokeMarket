@@ -3,6 +3,7 @@ import { DataTypes, Model } from 'sequelize';
 import SellerProfile from './SellerProfileModel.js';
 
 import sequelize from '../config/database.js';
+import { Card } from './indexModel.js';
 
 class Product extends Model {
   declare id: number;
@@ -17,6 +18,7 @@ class Product extends Model {
   declare createdAt: Date;
   declare updatedAt: Date | null;
   declare sellerProfile?: SellerProfile;
+  declare card?: Card;
 }
 
 Product.init(
