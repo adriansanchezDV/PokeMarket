@@ -1,0 +1,144 @@
+
+@baseUrl = http://localhost:3001
+
+
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@admin.com",
+  "password": "12345678"
+}
+
+### Comprobar acceso administrativo
+GET {{baseUrl}}/api/admin/access
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImVtYWlsIjoiYWRtaW5AYWRtaW4uY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzkxODI1NTg0LCJleHAiOjE3OTE4MjkxODR9.3V_0NZNBIRkFHX72SkpULRqoksLHaeAbjFs--7EiW1g
+
+### Intentar acceder sin token
+GET {{baseUrl}}/api/admin/access
+
+### Intentar acceder como cliente
+GET {{baseUrl}}/api/admin/access
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTgyNTYyMCwiZXhwIjoxNzkxODI5MjIwfQ.J-T4eFAFC-N-8IAB4UElaZhxFU2kHc69NWyaQcjlrtY
+
+### Intentar acceder como vendedor
+GET {{baseUrl}}/api/admin/access
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImVtYWlsIjoiYWRtaW5AYWRtaW4uY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzkxODI1NTg0LCJleHAiOjE3OTE4MjkxODR9.3V_0NZNBIRkFHX72SkpULRqoksLHaeAbjFs--7EiW1g
+
+
+
+@baseUrl = http://localhost:3001
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImVtYWlsIjoiYWRtaW5AYWRtaW4uY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzkyMDAxNzc4LCJleHAiOjE3OTIwMDUzNzh9.AWoShjBVIEXQn_sIA2OV2C8N_1y_CX8eoA9t6e_lNYA
+### Dashboard administrativo
+GET {{baseUrl}}/api/admin/dashboard
+Authorization: Bearer {{adminToken}}
+
+### Dashboard sin autenticación
+GET {{baseUrl}}/api/admin/dashboard
+
+### 1. Listar usuarios
+GET {{baseUrl}}/api/admin/users
+Authorization: Bearer {{adminToken}}
+
+### 2. Segunda página, cinco usuarios
+GET {{baseUrl}}/api/admin/users?page=2&limit=5
+Authorization: Bearer {{adminToken}}
+
+### 3. Filtrar vendedores
+GET {{baseUrl}}/api/admin/users?role=seller
+Authorization: Bearer {{adminToken}}
+
+### 4. Buscar por nombre o email
+GET {{baseUrl}}/api/admin/users?search=adrian
+Authorization: Bearer {{adminToken}}
+
+### 5. Combinar filtros
+GET {{baseUrl}}/api/admin/users?role=seller&search=tcg&page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### 6. Comprobar validación del rol
+GET {{baseUrl}}/api/admin/users?role=superadmin
+Authorization: Bearer {{adminToken}}
+
+### 7. Comprobar el límite máximo
+GET {{baseUrl}}/api/admin/users?limit=101
+Authorization: Bearer {{adminToken}}
+
+
+
+### Detalle de un usuario existente
+GET {{baseUrl}}/api/admin/users/2
+Authorization: Bearer {{adminToken}}
+
+### Usuario inexistente
+GET {{baseUrl}}/api/admin/users/999999
+Authorization: Bearer {{adminToken}}
+
+### ID inválido
+GET {{baseUrl}}/api/admin/users/abc
+Authorization: Bearer {{adminToken}}
+
+
+### Desactivar una tienda
+PATCH {{baseUrl}}/api/admin/sellers/1/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+### Reactivar una tienda
+PATCH {{baseUrl}}/api/admin/sellers/1/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isActive": true
+}
+
+### Estado inválido
+PATCH {{baseUrl}}/api/admin/sellers/1/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isActive": "false"
+}
+
+### Perfil inexistente
+PATCH {{baseUrl}}/api/admin/sellers/999999/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+
+### Vetar usuario
+PATCH {{baseUrl}}/admin/users/3/ban
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isBanned": true
+}
+
+### Rehabilitar usuario
+PATCH {{baseUrl}}/admin/users/3/ban
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isBanned": false
+}
+
+### Intentar vetar un administrador
+PATCH {{baseUrl}}/admin/users/1/ban
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isBanned": true
+}

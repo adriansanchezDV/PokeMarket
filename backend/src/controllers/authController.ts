@@ -55,6 +55,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       });
     }
 
+    if (user.isBanned) {
+      return res.status(403).json({
+        error: 'User account is banned',
+      });
+    }
+
     const token = generateAuthToken(user);
 
     res.json({

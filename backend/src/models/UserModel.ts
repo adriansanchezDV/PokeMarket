@@ -10,6 +10,7 @@ class User extends Model {
   declare createdAt: Date;
   declare updatedAt: Date | null;
   declare role: 'customer' | 'seller' | 'admin';
+  declare isBanned: boolean;
 }
 
 User.init(
@@ -40,6 +41,12 @@ User.init(
       type: DataTypes.ENUM('customer', 'seller', 'admin'),
       allowNull: false,
       defaultValue: 'customer',
+    },
+    isBanned: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      field: 'is_banned',
     },
   },
   {

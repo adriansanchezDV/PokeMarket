@@ -1,4 +1,4 @@
-import { col } from 'sequelize';
+import { col, Op } from 'sequelize';
 import { User, SellerProfile, Product, Order } from '../models/indexModel.js';
 
 const RECENT_ITEMS_LIMIT = 5;
@@ -171,5 +171,173 @@ export const getAdminDashboardStats = async () => {
     },
 
     generatedAt: new Date().toISOString(),
+  };
+};
+
+type UserRole = 'customer' | 'seller' | 'admin';
+
+interface GetAdminUsersOptions {
+  page: number;
+  limit: number;
+  search?: string;
+  role?: UserRole;
+}
+
+export const getAdminUsers = async ({ page, limit, search, role }: GetAdminUsersOptions) => {
+  const where: {
+    role?: UserRole;
+    [Op.or]?: Array<Record<string, unknown>>;
+  } = {};
+
+  if (role) {
+    where.role = role;
+  }
+
+  const searchTerm = search?.trim();
+
+  if (searchTerm) {
+    where[Op.or] = [
+      { fullName: { [Op.iLike]: `%${searchTerm}%` } },
+      { email: { [Op.iLike]: `%${searchTerm}%` } },
+    ];
+  }
+
+  const offset = (page - 1) * limit;
+
+  const { count, rows } = await User.findAndCountAll({
+    attributes: ['id', 'fullName', 'email', 'role', [col('User.created_at'), 'createdAt']],
+    where,
+    order: [[col('User.created_at'), 'DESC']],
+    limit,
+    offset,
+  });
+
+  return {
+    users: rows,
+    pagination: {
+      total: count,
+      page,
+      limit,
+      totalPages: Math.ceil(count / limit),
+    },
+  };
+};
+
+export const getAdminUserDetails = async (userId: number) => {
+  const user = await User.findByPk(userId, {
+    attributes: ['id', 'fullName', 'email', 'role', [col('User.created_at'), 'createdAt']],
+    include: [
+      {
+        model: SellerProfile,
+        as: 'sellerProfile',
+        required: false,
+        attributes: ['id', 'storeName', 'description', 'isActive', 'createdAt'],
+        include: [
+          {
+            model: Product,
+            as: 'products',
+            required: false,
+            attributes: [],
+          },
+        ],
+      },
+    ],
+  });
+
+  if (!user) {
+    return null;
+  }
+
+  const result = user.toJSON() as {
+    id: number;
+    fullName: string | null;
+    email: string;
+    role: 'customer' | 'seller' | 'admin';
+    createdAt: Date;
+    sellerProfile?: {
+      id: number;
+      storeName: string;
+      description: string | null;
+      isActive: boolean;
+      createdAt: Date;
+    } | null;
+  };
+
+  if (result.sellerProfile) {
+    const sellerProfileId = result.sellerProfile.id;
+
+    const [totalProducts, activeProducts, outOfStockProducts] = await Promise.all([
+      Product.count({
+        where: { sellerProfileId },
+      }),
+      Product.count({
+        where: { sellerProfileId, isActive: true },
+      }),
+      Product.count({
+        where: { sellerProfileId, isActive: true, stock: 0 },
+      }),
+    ]);
+
+    return {
+      ...result,
+      sellerProfile: {
+        ...result.sellerProfile,
+        products: {
+          total: totalProducts,
+          active: activeProducts,
+          outOfStock: outOfStockProducts,
+        },
+      },
+    };
+  }
+
+  return result;
+};
+
+export const updateAdminSellerStatus = async (sellerProfileId: number, isActive: boolean) => {
+  const sellerProfile = await SellerProfile.findByPk(sellerProfileId);
+
+  if (!sellerProfile) {
+    return null;
+  }
+
+  if (sellerProfile.isActive === isActive) {
+    return {
+      sellerProfile,
+      changed: false,
+    };
+  }
+
+  await sellerProfile.update({ isActive });
+
+  return {
+    sellerProfile,
+    changed: true,
+  };
+};
+
+export const updateAdminUserBanStatus = async (userId: number, isBanned: boolean) => {
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    return null;
+  }
+
+  if (user.role === 'admin') {
+    return { forbidden: true as const };
+  }
+
+  if (user.isBanned === isBanned) {
+    return {
+      user,
+      changed: false,
+    };
+  }
+
+  await user.update({ isBanned });
+
+  return {
+    user,
+    changed: true,
   };
 };

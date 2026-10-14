@@ -17,6 +17,7 @@ import storeRoutes from './routes/storeRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import shippingAddressRoutes from './routes/shippingAddressRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/stores', storeRoutes);
 app.use('/api', reviewRoutes);
 app.use('/api/shipping-addresses', shippingAddressRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/api/ping', (_req, res) => {
   res.json({ message: 'pong' });
