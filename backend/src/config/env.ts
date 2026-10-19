@@ -1,3 +1,4 @@
+
 import 'dotenv/config';
 
 const PORT = Number(process.env.PORT) || 3001;
@@ -8,6 +9,8 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined');
 }
 
+const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379';
+
 export default {
   PORT,
   JWT_SECRET,
@@ -16,4 +19,6 @@ export default {
   DB_NAME: process.env.DB_NAME,
   DB_USER: process.env.DB_USER,
   DB_PASSWORD: process.env.DB_PASSWORD,
+  REDIS_URL,
 };
+

@@ -2,8 +2,10 @@ import Card from '../../models/CardModel.js';
 import Set from '../../models/SetModel.js';
 import { getCard, getSet } from '../tcgdexService.js';
 import { mapTcgdexCard } from '../../mappers/tcgdexMapper.js';
+import { invalidateCardsCache } from '../cache/cardsCacheService.js';
 
-export const syncCard = async (tcgdexId: string) => {
+export const syncCard = async (tcgdexId: string,
+  shouldInvalidateCache = true,) => {
   const tcgdexCard = await getCard(tcgdexId);
 
   const set = await Set.findOne({
@@ -19,10 +21,14 @@ export const syncCard = async (tcgdexId: string) => {
   const cardData = mapTcgdexCard(tcgdexCard, set.id);
 
   const [card] = await Card.upsert(cardData, {
-    returning: true,
-  });
+  returning: true,
+});
 
-  return card;
+if (shouldInvalidateCache) {
+  await invalidateCardsCache(card.id);
+}
+
+return card;
 };
 
 export const syncSetCards = async (tcgdexSetId: string) => {
@@ -45,10 +51,12 @@ export const syncSetCards = async (tcgdexSetId: string) => {
   const syncedCards = [];
 
   for (const card of tcgdexSet.cards) {
-    const syncedCard = await syncCard(card.id);
+    const syncedCard = await syncCard(card.id, false);
 
     syncedCards.push(syncedCard);
   }
+
+  await invalidateCardsCache();
 
   return {
     set: set.name,

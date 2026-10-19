@@ -7,6 +7,7 @@ import {
   notifyFavoriteUsersAboutPriceDrop,
   notifyFavoriteUsersAboutRestock,
 } from './notificationService.js';
+import { invalidateCardDetailCache } from './cache/cardsCacheService.js';
 
 export const getAllProducts = async (filters: {
   userId?: number;
@@ -277,6 +278,8 @@ export const createProduct = async (
     description: data.description ?? null,
   });
 
+  await invalidateCardDetailCache(data.cardId);
+  
   return Product.findByPk(product.id, {
     include: [
       {
@@ -319,6 +322,8 @@ export const updateProduct = async (
   const oldPrice = Number(product.price);
 
   await product.update(data);
+
+  await invalidateCardDetailCache(product.cardId);
 
   const newStock = product.stock;
   const newPrice = Number(product.price);
@@ -390,6 +395,8 @@ export const updateProductStatus = async (
   await product.update({
     isActive,
   });
+
+  await invalidateCardDetailCache(product.cardId);
 
   return Product.findByPk(product.id, {
     include: [

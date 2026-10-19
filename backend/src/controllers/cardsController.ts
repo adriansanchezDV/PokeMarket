@@ -1,8 +1,13 @@
 import { Request, Response } from 'express';
 import { getAllCards, getCardById } from '../services/cardsService.js';
 import { syncCard, syncSetCards } from '../services/sync/cardSyncService.js';
+import { getCachedCardDetail, getCachedCardList, setCachedCardDetail, setCachedCardList } from '../services/cache/cardsCacheService.js';
 
 export const getCards = async (req: Request, res: Response) => {
+
+  console.log(
+  `[GET /cards] Controller ejecutado | ${req.method} ${req.originalUrl}`,
+);
   try {
     const { search, setId, rarity, category, number, artist, type, minHp, maxHp, page, limit } =
       req.query;
@@ -80,9 +85,39 @@ export const getCards = async (req: Request, res: Response) => {
 
       maxHp: maxHpValue,
     };
-    const cards = await getAllCards(filters, currentPage, currentLimit);
+    
+const cacheParams = {
+  filters,
+  page: currentPage,
+  limit: currentLimit,
+};
 
-    res.json(cards);
+type CardsResult = Awaited<ReturnType<typeof getAllCards>>;
+
+const cachedCards = await getCachedCardList<CardsResult>(cacheParams);
+
+if (cachedCards !== null) {
+  console.log(
+  `[GET /cards] Redis cache HIT | ${req.method} ${req.originalUrl}`,
+);
+  res.json(cachedCards);
+  return;
+}
+
+console.log(
+  `[GET /cards] Redis cache MISS | ${req.method} ${req.originalUrl}`,
+);
+
+const cards = await getAllCards(
+  filters,
+  currentPage,
+  currentLimit,
+);
+
+await setCachedCardList(cacheParams, cards);
+
+res.json(cards);
+
   } catch (error) {
     console.error(error);
 
@@ -90,6 +125,8 @@ export const getCards = async (req: Request, res: Response) => {
       error: 'Error retrieving cards',
     });
   }
+
+  
 };
 export const getSingleCard = async (req: Request, res: Response) => {
   try {
@@ -102,16 +139,30 @@ export const getSingleCard = async (req: Request, res: Response) => {
       return;
     }
 
-    const card = await getCardById(id);
+   
+type CardDetail = Awaited<ReturnType<typeof getCardById>>;
 
-    if (!card) {
-      res.status(404).json({
-        error: 'Card not found',
-      });
-      return;
-    }
+const cachedCard = await getCachedCardDetail<CardDetail>(id);
 
-    res.json(card);
+if (cachedCard !== null) {
+  console.log(`[GET /cards/${id}] Redis cache HIT`);
+  res.json(cachedCard);
+  return;
+}
+
+console.log(`[GET /cards/${id}] Redis cache MISS`);
+
+const card = await getCardById(id);
+
+if (!card) {
+  res.status(404).json({ error: 'Card not found' });
+  return;
+}
+
+await setCachedCardDetail(id, card);
+
+res.json(card);
+
   } catch (error) {
     console.error(error);
 

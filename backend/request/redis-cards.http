@@ -1,0 +1,14 @@
+### 1. Primera consulta: debería producir MISS
+GET http://localhost:3001/api/cards?setId=2&page=1&limit=10
+
+### 2. Repetir la misma consulta: debería producir HIT
+GET http://localhost:3001/api/cards?setId=2&page=1&limit=10
+
+### 3. Cambiar de página: debería producir MISS
+GET http://localhost:3001/api/cards?setId=2&page=2&limit=10
+
+### 4. Primera consulta al detalle: debería producir MISS
+GET http://localhost:3001/api/cards/1
+
+### 5. Repetir el detalle: debería producir HIT
+GET http://localhost:3001/api/cards/1

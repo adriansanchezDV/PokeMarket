@@ -10,3 +10,88 @@ POST http://localhost:3001/api/sets/swsh3/sync
 
 ### Sincronizar Furret
 POST http://localhost:3001/api/cards/swsh3-136/sync
+
+### Sincronizar todas las cartas de Darkness Ablaze
+POST http://localhost:3001/api/cards/set/swsh3/sync
+
+
+
+
+### ==========================================
+### SCARLET & VIOLET — 151
+### ==========================================
+
+### Sincronizar set
+POST http://localhost:3001/api/sets/sv03.5/sync
+
+### Sincronizar todas sus cartas
+POST http://localhost:3001/api/cards/set/sv03.5/sync
+
+
+### ==========================================
+### CROWN ZENITH
+### ==========================================
+
+### Sincronizar set
+POST http://localhost:3001/api/sets/swsh12.5/sync
+
+### Sincronizar todas sus cartas
+POST http://localhost:3001/api/cards/set/swsh12.5/sync
+
+
+### ==========================================
+### EVOLVING SKIES
+### ==========================================
+
+### Sincronizar set
+POST http://localhost:3001/api/sets/swsh7/sync
+
+### Sincronizar todas sus cartas
+POST http://localhost:3001/api/cards/set/swsh7/sync
+
+
+### ==========================================
+### PALDEAN FATES
+### ==========================================
+
+### Sincronizar set
+POST http://localhost:3001/api/sets/sv4.5/sync
+
+### Sincronizar todas sus cartas
+POST http://localhost:3001/api/cards/set/sv4.5/sync
+
+
+### ==========================================
+### BASE SET
+### ==========================================
+
+### Sincronizar set
+POST http://localhost:3001/api/sets/base1/sync
+
+### Sincronizar todas sus cartas
+POST http://localhost:3001/api/cards/set/base1/sync
+
+
+### ==========================================
+### COMPROBACIONES
+### ==========================================
+
+### Obtener todos los sets
+GET http://localhost:3001/api/sets
+
+
+### Obtener todos los sets desde PostgreSQL
+
+GET http://localhost:3001/api/sets
+
+### Obtener set por ID de PostgreSQL
+
+GET http://localhost:3001/api/sets/1
+
+
+### Obtener set por ID de PostgreSQL
+
+GET http://localhost:3001/api/sets/33
+
+###
+GET http://localhost:3001/api/sets/swsh3

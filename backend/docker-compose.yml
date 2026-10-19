@@ -1,3 +1,4 @@
+
 services:
   postgres:
     image: postgres:18
@@ -12,6 +13,18 @@ services:
     volumes:
       - pokemarket_postgres_data:/var/lib/postgresql
 
+  redis:
+    image: redis:8
+    container_name: pokemarket-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - pokemarket_redis_data:/data
+    command: redis-server --appendonly yes
+
 volumes:
   pokemarket_postgres_data:
     external: true
+
+  pokemarket_redis_data:
