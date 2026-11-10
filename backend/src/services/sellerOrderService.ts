@@ -1,4 +1,5 @@
 import { col, Op } from 'sequelize';
+import sequelize from '../config/database.js';
 import { Order, OrderItem, SellerProfile } from '../models/indexModel.js';
 import { createNotification } from './notificationService.js';
 
@@ -39,80 +40,90 @@ export const updateSellerOrderItemStatus = async (
     throw new Error('Seller profile not found');
   }
 
-  const orderItem = await OrderItem.findOne({
-    where: {
-      id: orderItemId,
-      sellerProfileId: sellerProfile.id,
-    },
-    include: [
-      {
-        model: Order,
-        as: 'order',
-      },
-    ],
-  });
-
-  if (!orderItem) {
-    throw new Error('Order item not found');
-  }
-
-  const validTransitions = {
-    processing: ['shipped'],
-    shipped: ['delivered'],
-  };
-
-  const allowedStatuses = validTransitions[orderItem.status as keyof typeof validTransitions] ?? [];
-
-  if (!allowedStatuses.includes(newStatus)) {
-    throw new Error(`Invalid status transition from ${orderItem.status} to ${newStatus}`);
-  }
-
-  orderItem.status = newStatus;
-
-  await orderItem.save();
-
-  if (newStatus === 'shipped') {
-    const order = orderItem.get('order') as Order;
-
-    await createNotification({
-      userId: order.userId,
-      type: 'ORDER_SHIPPED',
-      title: 'Pedido enviado',
-      message: `Tu pedido ha sido enviado.`,
-    });
-  }
-
-  if (newStatus === 'delivered') {
-    const order = orderItem.get('order') as Order;
-
-    await createNotification({
-      userId: order.userId,
-      type: 'ORDER_DELIVERED',
-      title: 'Pedido entregado',
-      message: 'Tu pedido ha sido entregado.',
-    });
-
-    const remainingItems = await OrderItem.count({
+  return sequelize.transaction(async (transaction) => {
+    const orderItem = await OrderItem.findOne({
       where: {
-        orderId: order.id,
-        status: {
-          [Op.not]: 'delivered',
-        },
+        id: orderItemId,
+        sellerProfileId: sellerProfile.id,
       },
+      transaction,
     });
 
-    if (remainingItems === 0) {
-      order.status = 'completed';
-      await order.save();
+    if (!orderItem) {
+      throw new Error('Order item not found');
     }
-  }
 
-  return Order.findByPk(orderItem.orderId, {
-    include: [
-      {
-        model: OrderItem,
-        as: 'items',
-      },
-    ],
+    // El pago, la cancelacion y el vendedor bloquean el mismo pedido.
+    const order = await Order.findByPk(orderItem.orderId, {
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    });
+
+    if (!order) {
+      throw new Error('Order item not found');
+    }
+
+    await orderItem.reload({ transaction });
+
+    const validTransitions = {
+      processing: ['shipped'],
+      shipped: ['delivered'],
+    };
+
+    const allowedStatuses =
+      validTransitions[orderItem.status as keyof typeof validTransitions] ?? [];
+
+    if (order.status !== 'paid' || !allowedStatuses.includes(newStatus)) {
+      throw new Error(`Invalid status transition from ${orderItem.status} to ${newStatus}`);
+    }
+
+    orderItem.status = newStatus;
+
+    await orderItem.save({ transaction });
+
+    if (newStatus === 'shipped') {
+      await createNotification({
+        transaction,
+        userId: order.userId,
+        type: 'ORDER_SHIPPED',
+        title: 'Pedido enviado',
+        message: `Tu pedido ha sido enviado.`,
+      });
+    }
+
+    if (newStatus === 'delivered') {
+      await createNotification({
+        transaction,
+        userId: order.userId,
+        type: 'ORDER_DELIVERED',
+        title: 'Pedido entregado',
+        message: 'Tu pedido ha sido entregado.',
+      });
+
+      const remainingItems = await OrderItem.count({
+        transaction,
+        where: {
+          orderId: order.id,
+          status: {
+            [Op.not]: 'delivered',
+          },
+        },
+      });
+
+      if (remainingItems === 0) {
+        order.status = 'completed';
+        await order.save({ transaction });
+      }
+    }
+
+    return Order.findByPk(orderItem.orderId, {
+      transaction,
+      include: [
+        {
+          model: OrderItem,
+          as: 'items',
+        },
+      ],
+    });
   });
 };

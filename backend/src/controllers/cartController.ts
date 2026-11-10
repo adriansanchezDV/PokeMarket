@@ -32,20 +32,6 @@ export const addCartItem: RequestHandler = async (req, res, next) => {
 
     return res.status(201).json(item);
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Product not found') {
-        return res.status(404).json({
-          error: error.message,
-        });
-      }
-
-      if (error.message === 'Product out of stock' || error.message === 'Insufficient stock') {
-        return res.status(409).json({
-          error: error.message,
-        });
-      }
-    }
-
     next(error);
   }
 };
@@ -64,20 +50,6 @@ export const updateCartItemQuantity: RequestHandler = async (req, res, next) => 
 
     return res.status(200).json(item);
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Cart not found' || error.message === 'Cart item not found') {
-        return res.status(404).json({
-          error: error.message,
-        });
-      }
-
-      if (error.message === 'Insufficient stock') {
-        return res.status(409).json({
-          error: error.message,
-        });
-      }
-    }
-
     next(error);
   }
 };
@@ -96,14 +68,6 @@ export const deleteCartItem: RequestHandler = async (req, res, next) => {
 
     return res.status(204).send();
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Cart not found' || error.message === 'Cart item not found') {
-        return res.status(404).json({
-          error: error.message,
-        });
-      }
-    }
-
     next(error);
   }
 };

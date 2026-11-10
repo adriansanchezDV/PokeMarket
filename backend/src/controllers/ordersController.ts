@@ -14,29 +14,6 @@ export const createNewOrder: RequestHandler = async (req, res, next) => {
 
     return res.status(201).json(order);
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Shipping address not found') {
-        return res.status(404).json({
-          error: error.message,
-        });
-      }
-      if (
-        error.message === 'Cart not found' ||
-        error.message === 'Cart is empty' ||
-        error.message === 'Product not found'
-      ) {
-        return res.status(400).json({
-          error: error.message,
-        });
-      }
-
-      if (error.message.startsWith('Insufficient stock')) {
-        return res.status(409).json({
-          error: error.message,
-        });
-      }
-    }
-
     next(error);
   }
 };
@@ -89,20 +66,6 @@ export const payOrderController: RequestHandler = async (req, res, next) => {
 
     return res.status(200).json(order);
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Order not found') {
-        return res.status(404).json({
-          error: error.message,
-        });
-      }
-
-      if (error.message === 'Order cannot be paid') {
-        return res.status(409).json({
-          error: error.message,
-        });
-      }
-    }
-
     next(error);
   }
 };
@@ -121,20 +84,6 @@ export const cancelOrderController: RequestHandler = async (req, res, next) => {
 
     return res.status(200).json(order);
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Order not found') {
-        return res.status(404).json({
-          error: error.message,
-        });
-      }
-
-      if (error.message === 'Order cannot be cancelled') {
-        return res.status(409).json({
-          error: error.message,
-        });
-      }
-    }
-
     next(error);
   }
 };

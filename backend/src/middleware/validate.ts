@@ -3,8 +3,6 @@ import type { ZodType } from 'zod';
 
 const validate = (schema: ZodType): RequestHandler => {
   return (req, res, next) => {
-    console.log('BODY RECIBIDO:', req.body);
-    console.log('CONTENT-TYPE:', req.headers['content-type']);
     const result = schema.safeParse(req.body);
 
     if (!result.success) {

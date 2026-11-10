@@ -10,20 +10,29 @@ const startServer = async () => {
 
     console.log('Database connection established');
 
-    await redisClient.connect();
-
-    const redisResponse = await redisClient.ping();
-
-    console.log('Redis connection established:', redisResponse);
+    void redisClient
+      .connect()
+      .then(() => {
+        console.log('Redis connection established');
+      })
+      .catch((error: unknown) => {
+        console.error(
+          'Redis unavailable; continuing without cache:',
+          error instanceof Error ? error.name : 'UnknownError',
+        );
+      });
 
     app.listen(config.PORT, () => {
       console.log(`Server running on http://localhost:${config.PORT}`);
     });
   } catch (error) {
-    console.error('Unable to start the server:', error);
+    console.error(
+      'Unable to start the server:',
+      error instanceof Error ? error.name : 'UnknownError',
+    );
 
     if (redisClient.isOpen) {
-      await redisClient.quit().catch(() => undefined);
+      redisClient.destroy();
     }
 
     process.exit(1);

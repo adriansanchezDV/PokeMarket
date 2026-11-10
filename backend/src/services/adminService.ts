@@ -1,4 +1,5 @@
 import { col, Op } from 'sequelize';
+import { invalidateSellerCardDetails } from './cache/cardsCacheService.js';
 import { User, SellerProfile, Product, Order } from '../models/indexModel.js';
 
 const RECENT_ITEMS_LIMIT = 5;
@@ -309,6 +310,7 @@ export const updateAdminSellerStatus = async (sellerProfileId: number, isActive:
   }
 
   await sellerProfile.update({ isActive });
+  await invalidateSellerCardDetails(sellerProfile.id);
 
   return {
     sellerProfile,

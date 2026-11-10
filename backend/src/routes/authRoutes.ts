@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import auth from '../middleware/auth.js';
+import { loginRateLimit, registerRateLimit } from '../middleware/rateLimit.js';
 
 import { register, login } from '../controllers/authController.js';
 
@@ -14,8 +15,8 @@ router.get('/seller-test', auth, requireRole('seller'), (_req, res) => {
   res.json({ message: 'Seller access granted' });
 });
 
-router.post('/register', validate(registerSchema), register);
+router.post('/register', registerRateLimit, validate(registerSchema), register);
 
-router.post('/login', validate(loginSchema), login);
+router.post('/login', loginRateLimit, validate(loginSchema), login);
 
 export default router;

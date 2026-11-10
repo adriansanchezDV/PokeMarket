@@ -210,6 +210,16 @@ Notification.belongsTo(User, {
   as: 'sender',
 });
 
+Notification.belongsTo(Product, {
+  foreignKey: 'productId',
+  as: 'product',
+});
+
+Product.hasMany(Notification, {
+  foreignKey: 'productId',
+  as: 'notifications',
+});
+
 export {
   User,
   SellerProfile,

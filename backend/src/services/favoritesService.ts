@@ -34,7 +34,7 @@ export const getUserFavorites = async (userId: number) => {
           {
             model: SellerProfile,
             as: 'sellerProfile',
-            attributes: ['id', 'storeName', 'description'],
+            attributes: ['id', 'storeName', 'description', 'isActive'],
           },
         ],
       },
@@ -47,7 +47,7 @@ export const getUserFavorites = async (userId: number) => {
 
     let availability: 'available' | 'out_of_stock' | 'inactive';
 
-    if (!data.product.isActive) {
+    if (!data.product.isActive || !data.product.sellerProfile?.isActive) {
       availability = 'inactive';
     } else if (data.product.stock <= 0) {
       availability = 'out_of_stock';

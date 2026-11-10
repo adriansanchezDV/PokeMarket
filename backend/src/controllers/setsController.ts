@@ -1,23 +1,16 @@
-
 import { Request, Response } from 'express';
-import {
-  getAllSets as findAllSets,
-  getSetById,
-} from '../services/setsService.js';
+import { getAllSets as findAllSets, getSetById } from '../services/setsService.js';
 import { syncSet } from '../services/sync/setSyncService.js';
 import {
   getSetsListCache,
   setSetsListCache,
   getSetDetailCache,
   setSetDetailCache,
-  invalidateSetsCache,
 } from '../services/cache/setsCacheService.js';
 
 export const getAllSets = async (_req: Request, res: Response) => {
   try {
-    const cachedSets = await getSetsListCache<
-      Awaited<ReturnType<typeof findAllSets>>
-    >();
+    const cachedSets = await getSetsListCache<Awaited<ReturnType<typeof findAllSets>>>();
 
     if (cachedSets !== null) {
       console.log('[GET /sets] Redis cache HIT');
@@ -58,9 +51,8 @@ export const getSingleSet = async (req: Request, res: Response) => {
       return;
     }
 
-    const cachedSet = await getSetDetailCache<
-      NonNullable<Awaited<ReturnType<typeof getSetById>>>
-    >(id);
+    const cachedSet =
+      await getSetDetailCache<NonNullable<Awaited<ReturnType<typeof getSetById>>>>(id);
 
     if (cachedSet !== null) {
       console.log(`[GET /sets/${id}] Redis cache HIT`);
@@ -94,10 +86,6 @@ export const getSingleSet = async (req: Request, res: Response) => {
 export const syncSingleSet = async (req: Request, res: Response) => {
   try {
     const set = await syncSet(String(req.params.id));
-
-    await invalidateSetsCache();
-
-    console.log('[POST /sets/:id/sync] Sets cache invalidated');
 
     res.status(201).json(set);
   } catch (error) {

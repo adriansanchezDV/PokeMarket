@@ -1,3 +1,4 @@
+import { AppError } from '../utils/AppError.js';
 import { col } from 'sequelize';
 import sequelize from '../config/database.js';
 import Cart from '../models/CartModel.js';
@@ -11,6 +12,9 @@ import {
   ShippingAddress,
 } from '../models/indexModel.js';
 import { createNotification } from './notificationService.js';
+import { requireActiveSellerProfile } from './sellerProfileService.js';
+import { requireActiveProduct } from './productService.js';
+import { invalidateCardDetailCache } from './cache/cardsCacheService.js';
 
 export const createOrder = async (userId: number, shippingAddressId: number) => {
   return sequelize.transaction(async (transaction) => {
@@ -42,13 +46,13 @@ export const createOrder = async (userId: number, shippingAddressId: number) => 
     });
 
     if (!cart) {
-      throw new Error('Cart not found');
+      throw new AppError(404, 'Cart not found');
     }
 
     const items = cart.get('items') as CartItem[];
 
     if (items.length === 0) {
-      throw new Error('Cart is empty');
+      throw new AppError(409, 'Cart is empty');
     }
 
     // Comprobamos que la dirección existe y pertenece al usuario
@@ -61,8 +65,31 @@ export const createOrder = async (userId: number, shippingAddressId: number) => 
     });
 
     if (!shippingAddress) {
-      throw new Error('Shipping address not found');
+      throw new AppError(404, 'Shipping address not found');
     }
+
+    const sellerIds = items.map((item) => {
+      const product = item.get('product') as Product;
+      if (!product) {
+        throw new AppError(404, 'Product not found');
+      }
+      return product.sellerProfileId;
+    });
+    await requireActiveSellerProfile(sellerIds, transaction);
+
+    const productIds = [...new Set(items.map((item) => item.productId))];
+    const products = await Product.findAll({
+      where: { id: productIds },
+      attributes: ['id', 'isActive'],
+      order: [['id', 'ASC']],
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    });
+
+    if (products.length !== productIds.length) {
+      throw new AppError(404, 'Product not found');
+    }
+    products.forEach(requireActiveProduct);
 
     let total = 0;
 
@@ -70,11 +97,11 @@ export const createOrder = async (userId: number, shippingAddressId: number) => 
       const product = item.get('product') as Product;
 
       if (!product) {
-        throw new Error('Product not found');
+        throw new AppError(404, 'Product not found');
       }
 
       if (product.stock < item.quantity) {
-        throw new Error(`Insufficient stock for product ${product.id}`);
+        throw new AppError(409, `Insufficient stock for product ${product.id}`);
       }
 
       total += Number(product.price) * item.quantity;
@@ -166,12 +193,26 @@ export const getOrderById = async (userId: number, orderId: number) => {
 };
 
 export const payOrder = async (userId: number, orderId: number) => {
-  return sequelize.transaction(async (transaction) => {
+  const cardIds = new Set<number>();
+  const order = await sequelize.transaction(async (transaction) => {
     const order = await Order.findOne({
       where: {
         id: orderId,
         userId,
       },
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    });
+
+    if (!order) {
+      throw new AppError(404, 'Order not found');
+    }
+
+    if (order.status !== 'pending') {
+      throw new AppError(409, 'Order cannot be paid');
+    }
+
+    await order.reload({
       include: [
         {
           model: OrderItem,
@@ -187,20 +228,21 @@ export const payOrder = async (userId: number, orderId: number) => {
       transaction,
     });
 
-    if (!order) {
-      throw new Error('Order not found');
-    }
-
-    if (order.status !== 'pending') {
-      throw new Error('Order cannot be paid');
-    }
-
     const items = order.get('items') as OrderItem[];
+    const stockItems = [...items].sort((a, b) => (a.productId ?? 0) - (b.productId ?? 0));
+
+    const sellerIds = items.map((item) => {
+      if (item.sellerProfileId === null) {
+        throw new AppError(409, 'Order cannot be paid');
+      }
+      return item.sellerProfileId;
+    });
+    await requireActiveSellerProfile(sellerIds, transaction);
 
     // Comprobamos y descontamos el stock al pagar
-    for (const item of items) {
+    for (const item of stockItems) {
       if (!item.productId) {
-        throw new Error('Product not found');
+        throw new AppError(404, 'Product not found');
       }
 
       const product = await Product.findByPk(item.productId, {
@@ -209,16 +251,23 @@ export const payOrder = async (userId: number, orderId: number) => {
       });
 
       if (!product) {
-        throw new Error('Product not found');
+        throw new AppError(404, 'Product not found');
+      }
+
+      requireActiveProduct(product);
+
+      if (product.sellerProfileId !== item.sellerProfileId) {
+        throw new AppError(409, 'Order cannot be paid');
       }
 
       if (product.stock < item.quantity) {
-        throw new Error(`Insufficient stock for product ${product.id}`);
+        throw new AppError(409, `Insufficient stock for product ${product.id}`);
       }
 
       product.stock -= item.quantity;
 
       await product.save({ transaction });
+      cardIds.add(product.cardId);
     }
 
     // El pago pasa el pedido a paid
@@ -255,15 +304,32 @@ export const payOrder = async (userId: number, orderId: number) => {
 
     return order;
   });
+
+  await invalidateCardDetailCache([...cardIds]);
+  return order;
 };
 
 export const cancelOrder = async (userId: number, orderId: number) => {
-  return sequelize.transaction(async (transaction) => {
+  const cardIds = new Set<number>();
+  const order = await sequelize.transaction(async (transaction) => {
     const order = await Order.findOne({
       where: {
         id: orderId,
         userId,
       },
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    });
+
+    if (!order) {
+      throw new AppError(404, 'Order not found');
+    }
+
+    if (!['pending', 'paid'].includes(order.status)) {
+      throw new AppError(409, 'Order cannot be cancelled');
+    }
+
+    await order.reload({
       include: [
         {
           model: OrderItem,
@@ -273,31 +339,26 @@ export const cancelOrder = async (userId: number, orderId: number) => {
       transaction,
     });
 
-    if (!order) {
-      throw new Error('Order not found');
-    }
-
-    if (!['pending', 'paid'].includes(order.status)) {
-      throw new Error('Order cannot be cancelled');
-    }
-
     const items = order.get('items') as OrderItem[];
+    const stockItems = [...items].sort((a, b) => (a.productId ?? 0) - (b.productId ?? 0));
 
     for (const item of items) {
       if (!['pending', 'processing'].includes(item.status)) {
-        throw new Error('Order cannot be cancelled');
+        throw new AppError(409, 'Order cannot be cancelled');
       }
     }
 
-    for (const item of items) {
-      if (item.productId) {
+    for (const item of stockItems) {
+      if (order.status === 'paid' && item.productId) {
         const product = await Product.findByPk(item.productId, {
           transaction,
+          lock: transaction.LOCK.UPDATE,
         });
 
         if (product) {
           product.stock += item.quantity;
           await product.save({ transaction });
+          cardIds.add(product.cardId);
         }
       }
 
@@ -318,4 +379,7 @@ export const cancelOrder = async (userId: number, orderId: number) => {
 
     return order;
   });
+
+  await invalidateCardDetailCache([...cardIds]);
+  return order;
 };

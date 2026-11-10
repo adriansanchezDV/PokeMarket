@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
-import { getAllCards, getCardById } from '../services/cardsService.js';
+import { filterActiveCardProducts, getAllCards, getCardById } from '../services/cardsService.js';
 import { syncCard, syncSetCards } from '../services/sync/cardSyncService.js';
-import { getCachedCardDetail, getCachedCardList, setCachedCardDetail, setCachedCardList } from '../services/cache/cardsCacheService.js';
+import {
+  getCachedCardDetail,
+  getCachedCardList,
+  setCachedCardDetail,
+  setCachedCardList,
+} from '../services/cache/cardsCacheService.js';
 
 export const getCards = async (req: Request, res: Response) => {
-
-  console.log(
-  `[GET /cards] Controller ejecutado | ${req.method} ${req.originalUrl}`,
-);
+  console.log(`[GET /cards] Controller ejecutado | ${req.method} ${req.originalUrl}`);
   try {
     const { search, setId, rarity, category, number, artist, type, minHp, maxHp, page, limit } =
       req.query;
@@ -85,39 +87,30 @@ export const getCards = async (req: Request, res: Response) => {
 
       maxHp: maxHpValue,
     };
-    
-const cacheParams = {
-  filters,
-  page: currentPage,
-  limit: currentLimit,
-};
 
-type CardsResult = Awaited<ReturnType<typeof getAllCards>>;
+    const cacheParams = {
+      filters,
+      page: currentPage,
+      limit: currentLimit,
+    };
 
-const cachedCards = await getCachedCardList<CardsResult>(cacheParams);
+    type CardsResult = Awaited<ReturnType<typeof getAllCards>>;
 
-if (cachedCards !== null) {
-  console.log(
-  `[GET /cards] Redis cache HIT | ${req.method} ${req.originalUrl}`,
-);
-  res.json(cachedCards);
-  return;
-}
+    const cachedCards = await getCachedCardList<CardsResult>(cacheParams);
 
-console.log(
-  `[GET /cards] Redis cache MISS | ${req.method} ${req.originalUrl}`,
-);
+    if (cachedCards !== null) {
+      console.log(`[GET /cards] Redis cache HIT | ${req.method} ${req.originalUrl}`);
+      res.json(cachedCards);
+      return;
+    }
 
-const cards = await getAllCards(
-  filters,
-  currentPage,
-  currentLimit,
-);
+    console.log(`[GET /cards] Redis cache MISS | ${req.method} ${req.originalUrl}`);
 
-await setCachedCardList(cacheParams, cards);
+    const cards = await getAllCards(filters, currentPage, currentLimit);
 
-res.json(cards);
+    await setCachedCardList(cacheParams, cards);
 
+    res.json(cards);
   } catch (error) {
     console.error(error);
 
@@ -125,44 +118,40 @@ res.json(cards);
       error: 'Error retrieving cards',
     });
   }
-
-  
 };
 export const getSingleCard = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
 
-    if (Number.isNaN(id)) {
+    if (!Number.isInteger(id) || id <= 0) {
       res.status(400).json({
         error: 'Invalid card id',
       });
       return;
     }
 
-   
-type CardDetail = Awaited<ReturnType<typeof getCardById>>;
+    type CardDetail = Awaited<ReturnType<typeof getCardById>>;
 
-const cachedCard = await getCachedCardDetail<CardDetail>(id);
+    const cachedCard = await getCachedCardDetail<CardDetail>(id);
 
-if (cachedCard !== null) {
-  console.log(`[GET /cards/${id}] Redis cache HIT`);
-  res.json(cachedCard);
-  return;
-}
+    if (cachedCard !== null) {
+      console.log(`[GET /cards/${id}] Redis cache HIT`);
+      res.json(await filterActiveCardProducts(cachedCard));
+      return;
+    }
 
-console.log(`[GET /cards/${id}] Redis cache MISS`);
+    console.log(`[GET /cards/${id}] Redis cache MISS`);
 
-const card = await getCardById(id);
+    const card = await getCardById(id);
 
-if (!card) {
-  res.status(404).json({ error: 'Card not found' });
-  return;
-}
+    if (!card) {
+      res.status(404).json({ error: 'Card not found' });
+      return;
+    }
 
-await setCachedCardDetail(id, card);
+    await setCachedCardDetail(id, card);
 
-res.json(card);
-
+    res.json(card);
   } catch (error) {
     console.error(error);
 

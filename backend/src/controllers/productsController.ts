@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express';
+import { Request, RequestHandler, Response, type NextFunction } from 'express';
 import SellerProfile from '../models/SellerProfileModel.js';
 import {
   createProduct,
@@ -163,11 +163,11 @@ export const getProducts: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
-export const getSingleProduct = async (req: Request, res: Response) => {
+export const getSingleProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
 
-    if (Number.isNaN(id)) {
+    if (!Number.isInteger(id) || id <= 0) {
       res.status(400).json({
         error: 'Invalid product id',
       });
@@ -185,15 +185,11 @@ export const getSingleProduct = async (req: Request, res: Response) => {
 
     res.json(product);
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: 'Error retrieving product',
-    });
+    next(error);
   }
 };
 
-export const createSingleProduct = async (req: Request, res: Response) => {
+export const createSingleProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       res.status(401).json({
@@ -219,22 +215,11 @@ export const createSingleProduct = async (req: Request, res: Response) => {
 
     res.status(201).json(product);
   } catch (error) {
-    console.error(error);
-
-    if (error instanceof Error && error.message === 'Card not found') {
-      res.status(404).json({
-        error: 'Card not found',
-      });
-      return;
-    }
-
-    res.status(500).json({
-      error: 'Error creating product',
-    });
+    next(error);
   }
 };
 
-export const updateSingleProduct = async (req: Request, res: Response) => {
+export const updateSingleProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       res.status(401).json({
@@ -276,11 +261,7 @@ export const updateSingleProduct = async (req: Request, res: Response) => {
 
     res.json(product);
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: 'Error updating product',
-    });
+    next(error);
   }
 };
 

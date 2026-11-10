@@ -1,4 +1,7 @@
 import { col, Op } from 'sequelize';
+import sequelize from '../config/database.js';
+import { AppError } from '../utils/AppError.js';
+import { requireActiveSellerProfile } from './sellerProfileService.js';
 import Product from '../models/ProductModel.js';
 import Card from '../models/CardModel.js';
 import SellerProfile from '../models/SellerProfileModel.js';
@@ -8,6 +11,12 @@ import {
   notifyFavoriteUsersAboutRestock,
 } from './notificationService.js';
 import { invalidateCardDetailCache } from './cache/cardsCacheService.js';
+
+export const requireActiveProduct = (product: Pick<Product, 'isActive'>) => {
+  if (!product.isActive) {
+    throw new AppError(409, 'Product is inactive');
+  }
+};
 
 export const getAllProducts = async (filters: {
   userId?: number;
@@ -139,6 +148,8 @@ export const getAllProducts = async (filters: {
     };
   }
 
+  const hasCardFilters = Reflect.ownKeys(cardWhere).length > 0;
+
   const offset = (page - 1) * limit;
 
   const sortField = {
@@ -166,12 +177,14 @@ export const getAllProducts = async (filters: {
           'types',
           'setId',
         ],
-        where: Object.keys(cardWhere).length ? cardWhere : undefined,
-        required: Object.keys(cardWhere).length > 0,
+        where: hasCardFilters ? cardWhere : undefined,
+        required: hasCardFilters,
       },
       {
         model: SellerProfile,
         as: 'sellerProfile',
+        where: { isActive: true },
+        required: true,
         attributes: ['id', 'storeName', 'description'],
       },
     ],
@@ -223,6 +236,8 @@ export const getProductById = async (id: number, userId?: number) => {
       {
         model: SellerProfile,
         as: 'sellerProfile',
+        where: { isActive: true },
+        required: true,
         attributes: ['id', 'storeName', 'description'],
       },
     ],
@@ -262,24 +277,33 @@ export const createProduct = async (
     description?: string;
   },
 ) => {
-  const card = await Card.findByPk(data.cardId);
+  const product = await sequelize.transaction(async (transaction) => {
+    await requireActiveSellerProfile(sellerProfileId, transaction);
 
-  if (!card) {
-    throw new Error('Card not found');
-  }
+    const card = await Card.findByPk(data.cardId, { transaction });
 
-  const product = await Product.create({
-    sellerProfileId,
-    cardId: data.cardId,
-    condition: data.condition,
-    language: data.language,
-    price: data.price,
-    stock: data.stock,
-    description: data.description ?? null,
+    if (!card) {
+      throw new AppError(404, 'Card not found');
+    }
+
+    const product = await Product.create(
+      {
+        sellerProfileId,
+        cardId: data.cardId,
+        condition: data.condition,
+        language: data.language,
+        price: data.price,
+        stock: data.stock,
+        description: data.description ?? null,
+      },
+      { transaction },
+    );
+
+    return product;
   });
 
   await invalidateCardDetailCache(data.cardId);
-  
+
   return Product.findByPk(product.id, {
     include: [
       {
@@ -307,21 +331,35 @@ export const updateProduct = async (
     description?: string;
   },
 ) => {
-  const product = await Product.findOne({
-    where: {
-      id,
-      sellerProfileId,
-    },
+  const result = await sequelize.transaction(async (transaction) => {
+    await requireActiveSellerProfile(sellerProfileId, transaction);
+
+    const product = await Product.findOne({
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+      where: {
+        id,
+        sellerProfileId,
+      },
+    });
+
+    if (!product) {
+      return null;
+    }
+
+    const oldStock = product.stock;
+    const oldPrice = Number(product.price);
+
+    await product.update(data, { transaction });
+
+    return { product, oldStock, oldPrice };
   });
 
-  if (!product) {
+  if (!result) {
     return null;
   }
 
-  const oldStock = product.stock;
-  const oldPrice = Number(product.price);
-
-  await product.update(data);
+  const { product, oldStock, oldPrice } = result;
 
   await invalidateCardDetailCache(product.cardId);
 
@@ -358,7 +396,7 @@ export const getSellerProducts = async (userId: number) => {
   });
 
   if (!sellerProfile) {
-    throw new Error('Seller profile not found');
+    throw new AppError(404, 'Seller profile not found');
   }
 
   return Product.findAll({
@@ -381,20 +419,32 @@ export const updateProductStatus = async (
   sellerProfileId: number,
   isActive: boolean,
 ) => {
-  const product = await Product.findOne({
-    where: {
-      id,
-      sellerProfileId,
-    },
+  const product = await sequelize.transaction(async (transaction) => {
+    if (isActive) {
+      await requireActiveSellerProfile(sellerProfileId, transaction);
+    }
+
+    const product = await Product.findOne({
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+      where: {
+        id,
+        sellerProfileId,
+      },
+    });
+
+    if (!product) {
+      return null;
+    }
+
+    await product.update({ isActive }, { transaction });
+
+    return product;
   });
 
   if (!product) {
     return null;
   }
-
-  await product.update({
-    isActive,
-  });
 
   await invalidateCardDetailCache(product.cardId);
 

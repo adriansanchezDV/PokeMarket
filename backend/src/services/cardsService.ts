@@ -130,6 +130,8 @@ export const getCardById = async (id: number) => {
           {
             model: SellerProfile,
             as: 'sellerProfile',
+            where: { isActive: true },
+            required: true,
           },
         ],
       },
@@ -166,7 +168,7 @@ export const getCardById = async (id: number) => {
       symbolUrl: cardData.cardSet.symbolUrl,
     },
 
-    products: cardData.products
+    products: (cardData.products as Product[])
       .sort((a: Product, b: Product) => Number(a.price) - Number(b.price))
       .map((product: Product) => {
         if (!product.sellerProfile) {
@@ -188,5 +190,27 @@ export const getCardById = async (id: number) => {
           },
         };
       }),
+  };
+};
+
+export const filterActiveCardProducts = async (
+  card: NonNullable<Awaited<ReturnType<typeof getCardById>>>,
+) => {
+  if (card.products.length === 0) {
+    return card;
+  }
+
+  const profiles = await SellerProfile.findAll({
+    where: {
+      id: [...new globalThis.Set(card.products.map((product) => product.seller.id))],
+      isActive: true,
+    },
+    attributes: ['id'],
+  });
+  const activeIds = new globalThis.Set(profiles.map((profile) => profile.id));
+
+  return {
+    ...card,
+    products: card.products.filter((product) => activeIds.has(product.seller.id)),
   };
 };

@@ -34,29 +34,83 @@ export const updateMe = async (req: Request, res: Response, next: NextFunction) 
 
     const { fullName, email } = req.body;
 
-    if (email && email !== user.email) {
-      const existingUser = await User.findOne({
-        where: { email },
+     if (
+      !req.body ||
+      typeof req.body !== 'object' ||
+      Array.isArray(req.body)
+    ) {
+      return res.status(400).json({
+        error: 'Invalid request body',
       });
+    }
 
-      if (existingUser) {
-        return res.status(409).json({
-          error: 'Email already registered',
+    const allowedFields = ['fullName', 'email'];
+    const receivedFields = Object.keys(req.body);
+
+    const hasInvalidFields = receivedFields.some(
+      (field) => !allowedFields.includes(field),
+    );
+
+    if (hasInvalidFields) {
+      return res.status(400).json({
+        error: 'Fields not allowed',
+      });
+    }
+
+    // 2. Debe existir al menos un campo para actualizar.
+    if (receivedFields.length === 0) {
+      return res.status(400).json({
+        error: 'At least one field is required',
+      });
+    }
+
+    // 3. Validar el nombre si se ha enviado.
+    if (fullName !== undefined) {
+      if (
+        typeof fullName !== 'string' ||
+        fullName.trim().length === 0
+      ) {
+        return res.status(400).json({
+          error: 'Invalid fullName',
         });
       }
+
+      user.fullName = fullName.trim();
     }
 
-    if (fullName !== undefined) {
-      user.fullName = fullName;
-    }
-
+    // 4. Validar el email si se ha enviado.
     if (email !== undefined) {
-      user.email = email;
+      if (
+        typeof email !== 'string' ||
+        email.trim().length === 0 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+      ) {
+        return res.status(400).json({
+          error: 'Invalid email',
+        });
+      }
+
+      const normalizedEmail = email.trim().toLowerCase();
+
+      if (normalizedEmail !== user.email.toLowerCase()) {
+        const existingUser = await User.findOne({
+          where: { email: normalizedEmail },
+        });
+
+        if (existingUser) {
+          return res.status(409).json({
+            error: 'Email already registered',
+          });
+        }
+      }
+
+      user.email = normalizedEmail;
     }
 
+    // 5. Guardar los cambios.
     await user.save();
 
-    res.json({
+    return res.json({
       id: user.id,
       fullName: user.fullName,
       email: user.email,

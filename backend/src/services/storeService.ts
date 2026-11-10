@@ -9,6 +9,9 @@ const getStoreStats = async (storeId: number) => {
         sellerProfileId: storeId,
         isActive: true,
       },
+      include: [
+        { model: SellerProfile, as: 'sellerProfile', where: { isActive: true }, required: true },
+      ],
     }),
 
     OrderItem.findAll({
@@ -119,6 +122,13 @@ export const getStoreProducts = async (storeId: number) => {
       [col('Product.created_at'), 'createdAt'],
     ],
     include: [
+      {
+        model: SellerProfile,
+        as: 'sellerProfile',
+        attributes: [],
+        where: { isActive: true },
+        required: true,
+      },
       {
         model: Card,
         as: 'card',

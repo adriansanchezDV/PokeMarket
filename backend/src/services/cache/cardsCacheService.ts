@@ -1,6 +1,7 @@
-
 import { createHash } from 'node:crypto';
 import redisClient from '../../config/redis.js';
+import Card from '../../models/CardModel.js';
+import Product from '../../models/ProductModel.js';
 
 const CACHE_TTL_SECONDS = 300;
 
@@ -13,27 +14,21 @@ type CardListCacheParams = {
   limit: number;
 };
 
-const createCardListKey = ({
-  filters,
-  page,
-  limit,
-}: CardListCacheParams): string => {
+const createCardListKey = ({ filters, page, limit }: CardListCacheParams): string => {
   const cacheParams = JSON.stringify({
     filters,
     page,
     limit,
   });
 
-  const hash = createHash('sha256')
-    .update(cacheParams)
-    .digest('hex');
+  const hash = createHash('sha256').update(cacheParams).digest('hex');
 
   return `${CARD_LIST_PREFIX}${hash}`;
 };
 
-const getCachedValue = async <T>(
-  key: string,
-): Promise<T | null> => {
+const getCachedValue = async <T>(key: string): Promise<T | null> => {
+  if (!redisClient.isReady) return null;
+
   try {
     const cachedValue = await redisClient.get(key);
 
@@ -53,10 +48,9 @@ const getCachedValue = async <T>(
   }
 };
 
-const setCachedValue = async (
-  key: string,
-  value: unknown,
-): Promise<void> => {
+const setCachedValue = async (key: string, value: unknown): Promise<void> => {
+  if (!redisClient.isReady) return;
+
   try {
     await redisClient.set(key, JSON.stringify(value), {
       EX: CACHE_TTL_SECONDS,
@@ -66,9 +60,7 @@ const setCachedValue = async (
   }
 };
 
-export const getCachedCardList = async <T>(
-  params: CardListCacheParams,
-): Promise<T | null> => {
+export const getCachedCardList = async <T>(params: CardListCacheParams): Promise<T | null> => {
   return getCachedValue<T>(createCardListKey(params));
 };
 
@@ -79,22 +71,15 @@ export const setCachedCardList = async (
   await setCachedValue(createCardListKey(params), cards);
 };
 
-export const getCachedCardDetail = async <T>(
-  id: number,
-): Promise<T | null> => {
+export const getCachedCardDetail = async <T>(id: number): Promise<T | null> => {
   return getCachedValue<T>(`${CARD_DETAIL_PREFIX}${id}`);
 };
 
-export const setCachedCardDetail = async (
-  id: number,
-  card: unknown,
-): Promise<void> => {
+export const setCachedCardDetail = async (id: number, card: unknown): Promise<void> => {
   await setCachedValue(`${CARD_DETAIL_PREFIX}${id}`, card);
 };
 
-const deleteKeysByPattern = async (
-  pattern: string,
-): Promise<void> => {
+const deleteKeysByPattern = async (pattern: string): Promise<void> => {
   const keysToDelete: string[] = [];
 
   for await (const keys of redisClient.scanIterator({
@@ -109,16 +94,16 @@ const deleteKeysByPattern = async (
   }
 };
 
-export const invalidateCardsCache = async (
-  cardId?: number,
-): Promise<void> => {
+export const invalidateCardsCache = async (cardId?: number | number[]): Promise<void> => {
+  if (!redisClient.isReady) return;
+
   try {
     // Cualquier sincronización puede cambiar los resultados de los listados.
     await deleteKeysByPattern(`${CARD_LIST_PREFIX}*`);
 
     if (cardId !== undefined) {
       // Si conocemos la carta, basta con borrar su detalle.
-      await redisClient.del(`${CARD_DETAIL_PREFIX}${cardId}`);
+      await invalidateCardDetailCache(cardId);
     } else {
       // Una sincronización de expansión puede afectar a muchas cartas.
       await deleteKeysByPattern(`${CARD_DETAIL_PREFIX}*`);
@@ -130,15 +115,42 @@ export const invalidateCardsCache = async (
   }
 };
 
+export const invalidateCardDetailCache = async (cardId: number | number[]): Promise<void> => {
+  if (!redisClient.isReady) return;
 
+  const ids = [...new Set(Array.isArray(cardId) ? cardId : [cardId])];
+  if (ids.length === 0) return;
 
-export const invalidateCardDetailCache = async (
-  cardId: number,
-): Promise<void> => {
   try {
-    await redisClient.del(`${CARD_DETAIL_PREFIX}${cardId}`);
-    console.log(`[Redis] Card detail cache invalidated: ${cardId}`);
+    await redisClient.del(ids.map((id) => CARD_DETAIL_PREFIX + id));
+    console.log('[Redis] Card detail cache invalidated:', ids);
   } catch (error) {
     console.error('Error invalidating card detail cache:', error);
+  }
+};
+
+export const invalidateSellerCardDetails = async (sellerProfileId: number): Promise<void> => {
+  if (!redisClient.isReady) return;
+
+  try {
+    const products = await Product.findAll({
+      where: { sellerProfileId },
+      attributes: ['cardId'],
+      group: ['cardId'],
+    });
+    await invalidateCardDetailCache(products.map((product) => product.cardId));
+  } catch (error) {
+    console.error('Error invalidating seller offers cache:', error);
+  }
+};
+
+export const invalidateSetCardDetails = async (setId: number): Promise<void> => {
+  if (!redisClient.isReady) return;
+
+  try {
+    const cards = await Card.findAll({ where: { setId }, attributes: ['id'] });
+    await invalidateCardDetailCache(cards.map((card) => card.id));
+  } catch (error) {
+    console.error('Error invalidating set cards cache:', error);
   }
 };
