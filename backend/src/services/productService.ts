@@ -367,11 +367,27 @@ export const updateProduct = async (
   const newPrice = Number(product.price);
 
   if (oldStock === 0 && newStock > 0) {
-    await notifyFavoriteUsersAboutRestock(product.id);
+    try {
+      await notifyFavoriteUsersAboutRestock(product.id);
+    } catch (error) {
+      console.error(
+        'Favorite restock notification failed after product update:',
+        product.id,
+        error instanceof Error ? error.name : 'UnknownError',
+      );
+    }
   }
 
   if (newPrice < oldPrice) {
-    await notifyFavoriteUsersAboutPriceDrop(product.id, oldPrice, newPrice);
+    try {
+      await notifyFavoriteUsersAboutPriceDrop(product.id, oldPrice, newPrice);
+    } catch (error) {
+      console.error(
+        'Favorite price-drop notification failed after product update:',
+        product.id,
+        error instanceof Error ? error.name : 'UnknownError',
+      );
+    }
   }
 
   return Product.findByPk(product.id, {

@@ -117,7 +117,7 @@ Content-Type: application/json
 
 
 ### Vetar usuario
-PATCH {{baseUrl}}/admin/users/3/ban
+PATCH {{baseUrl}}/api/admin/users/3/ban
 Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
@@ -126,7 +126,7 @@ Content-Type: application/json
 }
 
 ### Rehabilitar usuario
-PATCH {{baseUrl}}/admin/users/3/ban
+PATCH {{baseUrl}}/api/admin/users/3/ban
 Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
@@ -135,10 +135,35 @@ Content-Type: application/json
 }
 
 ### Intentar vetar un administrador
-PATCH {{baseUrl}}/admin/users/1/ban
+PATCH {{baseUrl}}/api/admin/users/14/ban
 Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
   "isBanned": true
+}
+
+
+###
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "adrian1@test.com",
+  "password": "12345678"
+}
+
+
+
+### 1. Usuario activo: debe funcionar
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MjAwMjMzNywiZXhwIjoxNzkyMDA1OTM3fQ.92zOaK_vyx3hpF1ztsbdJ4WtWL_dD0HNBDYG6YBmLlo
+
+### 2. Vetar al usuario desde el administrador
+PATCH {{baseUrl}}/api/admin/users/6/ban
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isBanned": false
 }

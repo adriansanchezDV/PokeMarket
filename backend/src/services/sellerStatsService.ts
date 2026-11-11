@@ -1,7 +1,8 @@
-import { col, Op } from 'sequelize';
+import { col } from 'sequelize';
 import Product from '../models/ProductModel.js';
 import SellerProfile from '../models/SellerProfileModel.js';
 import OrderItem from '../models/OrderItemModel.js';
+import Order from '../models/OrderModel.js';
 
 export const getSellerStats = async (userId: number) => {
   const sellerProfile = await SellerProfile.findOne({
@@ -21,17 +22,26 @@ export const getSellerStats = async (userId: number) => {
   const orderItems = await OrderItem.findAll({
     where: {
       sellerProfileId: sellerProfile.id,
-      status: {
-        [Op.not]: 'cancelled',
-      },
     },
+    include: [{ model: Order, as: 'order', attributes: ['status'] }],
   });
+
+  const salesItems = orderItems.filter(
+    (item) =>
+      ['processing', 'shipped', 'delivered'].includes(item.status) &&
+      ['paid', 'completed'].includes((item.get('order') as Order).status),
+  );
 
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
 
-  const monthOrderItems = orderItems.filter((item) => item.createdAt >= startOfMonth);
+  const nextMonth = new Date(startOfMonth);
+  nextMonth.setMonth(nextMonth.getMonth() + 1);
+  const monthOrderItems = salesItems.filter((item) => {
+    const createdAt = item.get('created_at') as Date;
+    return createdAt >= startOfMonth && createdAt < nextMonth;
+  });
 
   const recentOrders = await OrderItem.findAll({
     where: {
@@ -64,12 +74,9 @@ export const getSellerStats = async (userId: number) => {
     },
 
     sales: {
-      totalItems: orderItems
-        .filter((item) => item.status !== 'cancelled')
-        .reduce((total, item) => total + item.quantity, 0),
+      totalItems: salesItems.reduce((total, item) => total + item.quantity, 0),
 
-      totalRevenue: orderItems
-        .filter((item) => item.status !== 'cancelled')
+      totalRevenue: salesItems
         .reduce((total, item) => total + Number(item.unitPrice) * item.quantity, 0)
         .toFixed(2),
 
@@ -85,7 +92,7 @@ export const getSellerStats = async (userId: number) => {
       quantity: item.quantity,
       unitPrice: item.unitPrice,
       status: item.status,
-      createdAt: item.createdAt,
+      createdAt: item.get('created_at') as Date,
     })),
   };
 };

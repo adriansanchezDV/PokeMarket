@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from 'express';
 
 import { User } from '../models/indexModel.js';
 import { authenticateUser, generateAuthToken } from '../services/authService.js';
+import { emailMatches } from '../utils/email.js';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -15,7 +16,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     }
 
     const existingUser = await User.findOne({
-      where: { email },
+      where: emailMatches(email),
     });
 
     if (existingUser) {

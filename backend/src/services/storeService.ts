@@ -1,6 +1,6 @@
 import { col, Op } from 'sequelize';
 
-import { SellerProfile, Product, Card, OrderItem, Review } from '../models/indexModel.js';
+import { SellerProfile, Product, Card, Order, OrderItem, Review } from '../models/indexModel.js';
 
 const getStoreStats = async (storeId: number) => {
   const [productCount, salesItems, reviews] = await Promise.all([
@@ -18,10 +18,19 @@ const getStoreStats = async (storeId: number) => {
       where: {
         sellerProfileId: storeId,
         status: {
-          [Op.not]: 'cancelled',
+          [Op.in]: ['processing', 'shipped', 'delivered'],
         },
       },
       attributes: ['quantity'],
+      include: [
+        {
+          model: Order,
+          as: 'order',
+          attributes: [],
+          where: { status: { [Op.in]: ['paid', 'completed'] } },
+          required: true,
+        },
+      ],
     }),
 
     Review.findAll({

@@ -1,6 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
 
 import { User } from '../models/indexModel.js';
+import { Op } from 'sequelize';
+import { emailMatches, normalizeEmail } from '../utils/email.js';
 
 export const getMe = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -34,11 +36,7 @@ export const updateMe = async (req: Request, res: Response, next: NextFunction) 
 
     const { fullName, email } = req.body;
 
-     if (
-      !req.body ||
-      typeof req.body !== 'object' ||
-      Array.isArray(req.body)
-    ) {
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
       return res.status(400).json({
         error: 'Invalid request body',
       });
@@ -47,9 +45,7 @@ export const updateMe = async (req: Request, res: Response, next: NextFunction) 
     const allowedFields = ['fullName', 'email'];
     const receivedFields = Object.keys(req.body);
 
-    const hasInvalidFields = receivedFields.some(
-      (field) => !allowedFields.includes(field),
-    );
+    const hasInvalidFields = receivedFields.some((field) => !allowedFields.includes(field));
 
     if (hasInvalidFields) {
       return res.status(400).json({
@@ -66,10 +62,7 @@ export const updateMe = async (req: Request, res: Response, next: NextFunction) 
 
     // 3. Validar el nombre si se ha enviado.
     if (fullName !== undefined) {
-      if (
-        typeof fullName !== 'string' ||
-        fullName.trim().length === 0
-      ) {
+      if (typeof fullName !== 'string' || fullName.trim().length === 0) {
         return res.status(400).json({
           error: 'Invalid fullName',
         });
@@ -90,18 +83,16 @@ export const updateMe = async (req: Request, res: Response, next: NextFunction) 
         });
       }
 
-      const normalizedEmail = email.trim().toLowerCase();
+      const normalizedEmail = normalizeEmail(email);
 
-      if (normalizedEmail !== user.email.toLowerCase()) {
-        const existingUser = await User.findOne({
-          where: { email: normalizedEmail },
+      const existingUser = await User.findOne({
+        where: { [Op.and]: [emailMatches(normalizedEmail), { id: { [Op.ne]: user.id } }] },
+      });
+
+      if (existingUser) {
+        return res.status(409).json({
+          error: 'Email already registered',
         });
-
-        if (existingUser) {
-          return res.status(409).json({
-            error: 'Email already registered',
-          });
-        }
       }
 
       user.email = normalizedEmail;

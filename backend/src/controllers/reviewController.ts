@@ -39,7 +39,19 @@ export const getProductReviews = async (req: Request, res: Response, next: NextF
       });
     }
 
-    const { page, limit } = getProductReviewsSchema.parse(req.query);
+    const parsed = getProductReviewsSchema.safeParse(req.query);
+
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        details: parsed.error.issues.map((issue) => ({
+          field: issue.path.join('.'),
+          message: issue.message,
+        })),
+      });
+    }
+
+    const { page, limit } = parsed.data;
 
     const userId = req.user?.id;
 

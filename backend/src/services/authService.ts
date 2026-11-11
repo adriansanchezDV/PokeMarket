@@ -3,15 +3,19 @@ import jwt from 'jsonwebtoken';
 
 import config from '../config/env.js';
 import { User } from '../models/indexModel.js';
+import { emailMatches } from '../utils/email.js';
 
 export const authenticateUser = async (email: string, password: string) => {
-  const user = await User.findOne({
-    where: { email },
+  const users = await User.findAll({
+    where: emailMatches(email),
+    limit: 2,
   });
 
-  if (!user) {
+  if (users.length !== 1) {
     return null;
   }
+
+  const [user] = users;
 
   const passwordCorrect = await bcrypt.compare(password, user.password);
 

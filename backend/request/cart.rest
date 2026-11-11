@@ -1,0 +1,34 @@
+### Login como customer
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "adrian1@test.com",
+  "password": "12345678"
+}
+
+
+### Obtener carrito
+GET http://localhost:3001/api/cart
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDA5NjEyMywiZXhwIjoxNzkwMDk5NzIzfQ.1z27k9Tie6SOys1vX8Z7SqfxmqRg39m8p8m7XBvIo2M
+
+
+### Añadir producto al carrito
+POST http://localhost:3001/api/cart/items/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDA5NjEyMywiZXhwIjoxNzkwMDk5NzIzfQ.1z27k9Tie6SOys1vX8Z7SqfxmqRg39m8p8m7XBvIo2M
+
+### Cambiar cantidad
+PATCH http://localhost:3001/api/cart/items/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDAxNzY0MSwiZXhwIjoxNzkwMDIxMjQxfQ.4-R6i1N2MikYc7aEVoDr_5Mv28vANbQR91MWGdG-_VE
+Content-Type: application/json
+
+{
+  "quantity": 9
+}
+
+### Eliminar producto del carrito
+DELETE http://localhost:3001/api/cart/items/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDAxNzY0MSwiZXhwIjoxNzkwMDIxMjQxfQ.4-R6i1N2MikYc7aEVoDr_5Mv28vANbQR91MWGdG-_VE
+
+### Ver producto
+GET http://localhost:3001/api/products/1

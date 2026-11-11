@@ -33,10 +33,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiO
 Content-Type: application/json
 
 {
-  "cardId": 2,
+  "cardId": 1,
   "condition": "Near Mint",
   "language": "English",
-  "price": -12.50,
+  "price": 12.50,
   "stock": 3
 }
 
@@ -122,3 +122,24 @@ GET http://localhost:3001/api/products?sort=createdAt&order=desc
 
 ### Products - filters + pagination + sorting
 GET http://localhost:3001/api/products?cardId=2&condition=Near%20Mint&language=English&minPrice=10&maxPrice=20&sort=price&order=asc&page=1&limit=5
+
+### Default
+GET http://localhost:3001/api/products
+
+###
+GET http://localhost:3001/api/seller/stats
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJzZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDI3NDIwOCwiZXhwIjoxNzkwMjc3ODA4fQ.GACdvLSdzrzs3VMxlS9wvgOFA0RrnC_BQ17RQsQlUVg
+
+###
+GET http://localhost:3001/api/products?search=butter
+
+
+###
+GET http://localhost:3001/api/products?search=butter&condition=Near%20Mint
+
+###
+GET http://localhost:3001/api/products?type=Grass
+
+
+###
+GET http://localhost:3001/api/products?minHp=100

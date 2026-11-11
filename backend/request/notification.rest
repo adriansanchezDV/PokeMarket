@@ -1,3 +1,200 @@
+###
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "adrian2@test.com",
+  "password": "12345678"
+}
+
 ### Obtener mis notificaciones
 GET http://localhost:3001/api/notifications
-Authorization: Bearer {{token}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTgyNDU2OCwiZXhwIjoxNzkxODI4MTY4fQ.jHjh_0HpkaXO2WL4-NXpPOywc2OHc2iv6ZLxE2OO6vc
+
+
+### Contador de no leídas
+GET http://localhost:3001/api/notifications/unread-count
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzA0MCwiZXhwIjoxNzkxMzk2NjQwfQ.Y5HQvyz0R2rjiSI6I2vNPmI1ZCHhUtdAgiRu2TAQmk8
+
+
+### Marcar notificación 1 como leída
+PATCH http://localhost:3001/api/notifications/4/read
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzA0MCwiZXhwIjoxNzkxMzk2NjQwfQ.Y5HQvyz0R2rjiSI6I2vNPmI1ZCHhUtdAgiRu2TAQmk8
+
+
+### Marcar todas como leídas
+PATCH http://localhost:3001/api/notifications/read-all
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzA0MCwiZXhwIjoxNzkxMzk2NjQwfQ.Y5HQvyz0R2rjiSI6I2vNPmI1ZCHhUtdAgiRu2TAQmk8
+
+
+
+### REGISTER CUSTOMER
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Cliente Notifications",
+  "email": "notifications.customer@test.com",
+  "password": "Password123!"
+}
+
+
+### LOGIN CUSTOMER
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "notifications.customer@test.com",
+  "password": "Password123!"
+}
+
+###
+@customerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTQ3OTQxOCwiZXhwIjoxNzkxNDgzMDE4fQ.0kxPFSBrP0rOWVBH3y8GwhJM2Q68RyuGFL0zJ3u2F7w
+
+
+### REGISTER SELLER
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Vendedor Notifications 2",
+  "email": "notifications.seller2@test.com",
+  "password": "Password123!"
+}
+
+
+### LOGIN SELLER
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "notifications.seller2@test.com",
+  "password": "Password123!"
+}
+
+###
+@sellerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoibm90aWZpY2F0aW9ucy5zZWxsZXJAdGVzdC5jb20iLCJyb2xlIjoiY3VzdG9tZXIiLCJpYXQiOjE3OTE0Nzk0ODcsImV4cCI6MTc5MTQ4MzA4N30.iHkyfH780HqN4ghyxdDS0dpmYh67QY8lUxCrbaTS5L0
+
+
+### CREATE SELLER PROFILE
+POST http://localhost:3001/api/sellers/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoibm90aWZpY2F0aW9ucy5zZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6ImN1c3RvbWVyIiwiaWF0IjoxNzkxNDgwNzA2LCJleHAiOjE3OTE0ODQzMDZ9.xIu7DYNw-UegTO8EqVOborWmfOAz-ri70oXzWOYBLkw
+Content-Type: application/json
+
+{
+  "storeName": "Notifications TCG Store 2",
+  "description": "Tienda para probar notificaciones"
+}
+
+### Crear producto
+POST http://localhost:3001/api/products
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoibm90aWZpY2F0aW9ucy5zZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTQ4MjgyNCwiZXhwIjoxNzkxNDg2NDI0fQ.OtTvzAUfabhTDbBXFRum40jYfcFYcXwQSpOjR8p_1nM
+Content-Type: application/json
+
+{
+  "cardId": 23,
+  "condition": "Near Mint",
+  "language": "English",
+  "price": 12.50,
+  "stock": 3,
+  "description": "Carta en perfecto estado"
+}
+
+### GET PRODUCTS
+GET http://localhost:3001/api/products
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTgyNDU2OCwiZXhwIjoxNzkxODI4MTY4fQ.jHjh_0HpkaXO2WL4-NXpPOywc2OHc2iv6ZLxE2OO6vc
+
+### CREATE SHIPPING ADDRESS
+POST http://localhost:3001/api/shipping-addresses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTQ3OTQxOCwiZXhwIjoxNzkxNDgzMDE4fQ.0kxPFSBrP0rOWVBH3y8GwhJM2Q68RyuGFL0zJ3u2F7w
+Content-Type: application/json
+
+{
+  "recipientName": "Cliente Notifications",
+  "street": "Calle Nueva 100",
+  "city": "Barcelona",
+  "postalCode": "08001",
+  "province": "Barcelona",
+  "country": "España",
+  "phone": "600123123"
+}
+
+
+### Get shipping addresses
+GET http://localhost:3001/api/shipping-addresses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTQ3OTQxOCwiZXhwIjoxNzkxNDgzMDE4fQ.0kxPFSBrP0rOWVBH3y8GwhJM2Q68RyuGFL0zJ3u2F7w
+
+### ADD PRODUCT TO CART
+POST http://localhost:3001/api/cart/items/20
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTQ3OTQxOCwiZXhwIjoxNzkxNDgzMDE4fQ.0kxPFSBrP0rOWVBH3y8GwhJM2Q68RyuGFL0zJ3u2F7w
+
+
+### CREATE ORDER
+POST http://localhost:3001/api/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTQ3OTQxOCwiZXhwIjoxNzkxNDgzMDE4fQ.0kxPFSBrP0rOWVBH3y8GwhJM2Q68RyuGFL0zJ3u2F7w
+Content-Type: application/json
+
+{
+  "shippingAddressId": 4
+}
+
+
+### SELLER NOTIFICATIONS BEFORE PAYMENT
+GET http://localhost:3001/api/notifications
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoibm90aWZpY2F0aW9ucy5zZWxsZXJAdGVzdC5jb20iLCJyb2xlIjoic2VsbGVyIiwiaWF0IjoxNzkxNDc5OTMxLCJleHAiOjE3OTE0ODM1MzF9.HKFj0hNwT__5uqWQvSsNr5XsqnNwqgkV71SAXwEzI1Q
+
+### SELLER UNREAD COUNT BEFORE PAYMENT
+GET http://localhost:3001/api/notifications/unread-count
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImVtYWlsIjoibm90aWZpY2F0aW9ucy5zZWxsZXJAdGVzdC5jb20iLCJyb2xlIjoic2VsbGVyIiwiaWF0IjoxNzkxNDc5OTMxLCJleHAiOjE3OTE0ODM1MzF9.HKFj0hNwT__5uqWQvSsNr5XsqnNwqgkV71SAXwEzI1Q
+
+
+### PAY ORDER
+POST http://localhost:3001/api/orders/17/pay
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTQ3OTQxOCwiZXhwIjoxNzkxNDgzMDE4fQ.0kxPFSBrP0rOWVBH3y8GwhJM2Q68RyuGFL0zJ3u2F7w
+
+### GET ORDER
+GET http://localhost:3001/api/orders/16
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTQ3OTQxOCwiZXhwIjoxNzkxNDgzMDE4fQ.0kxPFSBrP0rOWVBH3y8GwhJM2Q68RyuGFL0zJ3u2F7w
+
+
+### SELLER NOTIFICATIONS AFTER PAYMENT
+GET http://localhost:3001/api/notifications
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoibm90aWZpY2F0aW9ucy5zZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTQ4MDg3NywiZXhwIjoxNzkxNDg0NDc3fQ.ylKy9r0HeQXwktOdr_U-nU72y_aE2zpRjY4kzc2gB38
+
+
+
+
+### Add product to favorites
+POST http://localhost:3001/api/favorites/24
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTgyNDU2OCwiZXhwIjoxNzkxODI4MTY4fQ.jHjh_0HpkaXO2WL4-NXpPOywc2OHc2iv6ZLxE2OO6vc
+
+
+
+### Get my favorites
+GET http://localhost:3001/api/favorites
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTQ4MzM5NiwiZXhwIjoxNzkxNDg2OTk2fQ.S_DUh4GMnSICeKNRFq5HfslXJiqdqoZw5u8iIC7w2ew
+
+### Ver notificaciones
+GET http://localhost:3001/api/notifications
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoibm90aWZpY2F0aW9ucy5jdXN0b21lckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MTQ4MzM5NiwiZXhwIjoxNzkxNDg2OTk2fQ.S_DUh4GMnSICeKNRFq5HfslXJiqdqoZw5u8iIC7w2ew
+
+
+
+### Poner producto sin stock
+PATCH http://localhost:3001/api/products/24
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoibm90aWZpY2F0aW9ucy5zZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTgyNDY0NSwiZXhwIjoxNzkxODI4MjQ1fQ.tlDfglzw35teWOVs2v3vIxdGx8KVdlF9bgMzmoNFhJQ
+
+Content-Type: application/json
+
+{
+    "price": 15.00,
+    "stock": 0
+}
+
+###
+PATCH http://localhost:3001/api/products/24
+Content-Type: application/json
+
+{
+  "stock": 0
+}

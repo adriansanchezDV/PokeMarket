@@ -54,11 +54,14 @@ POST http://localhost:3001/api/cards/set/swsh7/sync
 ### PALDEAN FATES
 ### ==========================================
 
+### Listar expansiones de Scarlet & Violet en TCGdex
+GET https://api.tcgdex.net/v2/en/sets
+
 ### Sincronizar set
-POST http://localhost:3001/api/sets/sv4.5/sync
+POST http://localhost:3001/api/sets/sv04.5/sync
 
 ### Sincronizar todas sus cartas
-POST http://localhost:3001/api/cards/set/sv4.5/sync
+POST http://localhost:3001/api/cards/set/sv04.5/sync
 
 
 ### ==========================================

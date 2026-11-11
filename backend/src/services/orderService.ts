@@ -20,36 +20,25 @@ export const createOrder = async (userId: number, shippingAddressId: number) => 
   return sequelize.transaction(async (transaction) => {
     const cart = await Cart.findOne({
       where: { userId },
-      include: [
-        {
-          model: CartItem,
-          as: 'items',
-          include: [
-            {
-              model: Product,
-              as: 'product',
-              include: [
-                {
-                  model: Card,
-                  as: 'card',
-                },
-                {
-                  model: SellerProfile,
-                  as: 'sellerProfile',
-                },
-              ],
-            },
-          ],
-        },
-      ],
       transaction,
+      lock: transaction.LOCK.UPDATE,
     });
 
     if (!cart) {
       throw new AppError(404, 'Cart not found');
     }
 
-    const items = cart.get('items') as CartItem[];
+    const items = await CartItem.findAll({
+      where: { cartId: cart.id },
+      include: [
+        {
+          model: Product,
+          as: 'product',
+          attributes: ['id', 'sellerProfileId'],
+        },
+      ],
+      transaction,
+    });
 
     if (items.length === 0) {
       throw new AppError(409, 'Cart is empty');
@@ -80,21 +69,25 @@ export const createOrder = async (userId: number, shippingAddressId: number) => 
     const productIds = [...new Set(items.map((item) => item.productId))];
     const products = await Product.findAll({
       where: { id: productIds },
-      attributes: ['id', 'isActive'],
+      include: [
+        { model: Card, as: 'card' },
+        { model: SellerProfile, as: 'sellerProfile' },
+      ],
       order: [['id', 'ASC']],
       transaction,
-      lock: transaction.LOCK.UPDATE,
+      lock: { level: transaction.LOCK.UPDATE, of: Product },
     });
 
     if (products.length !== productIds.length) {
       throw new AppError(404, 'Product not found');
     }
     products.forEach(requireActiveProduct);
+    const productsById = new Map(products.map((product) => [product.id, product]));
 
     let total = 0;
 
     for (const item of items) {
-      const product = item.get('product') as Product;
+      const product = productsById.get(item.productId);
 
       if (!product) {
         throw new AppError(404, 'Product not found');
@@ -128,7 +121,7 @@ export const createOrder = async (userId: number, shippingAddressId: number) => 
     );
 
     for (const item of items) {
-      const product = item.get('product') as Product;
+      const product = productsById.get(item.productId)!;
       const card = product.get('card') as Card;
       const sellerProfile = product.get('sellerProfile') as SellerProfile;
 

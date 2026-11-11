@@ -1,0 +1,65 @@
+### Todas las cartas
+GET http://localhost:3001/api/cards
+
+### Carta individual
+
+GET http://localhost:3001/api/cards/1
+
+### Carta inexistente
+
+GET http://localhost:3001/api/cards/99999
+
+###
+
+
+GET http://localhost:3001/api/cards?setId=2
+
+
+###
+GET http://localhost:3001/api/cards?rarity=Secret Rare
+
+###
+GET http://localhost:3001/api/cards?category=Trainer
+
+###
+GET http://localhost:3001/api/cards?name=charizard
+
+
+###
+### Página 1
+GET http://localhost:3001/api/cards?page=2&limit=20&setId=1
+
+
+### Butterfree
+GET http://localhost:3001/api/cards?name=butter&page=1&limit=10
+
+### Rareza + paginación
+GET http://localhost:3001/api/cards?rarity=Rare&page=1&limit=10
+
+### Set + paginación
+GET http://localhost:3001/api/cards?setId=1&page=4&limit=20
+
+
+
+###
+GET http://localhost:3001/api/cards?search=butter
+
+###
+GET http://localhost:3001/api/cards?search=136
+
+
+### Buscar + filtro
+GET http://localhost:3001/api/cards?search=butter&category=Pokemon
+
+
+###
+GET http://localhost:3001/api/cards?type=Fire
+
+###
+GET http://localhost:3001/api/cards?minHp=100&maxHp=200
+
+###
+GET http://localhost:3001/api/cards?search=butter&minHp=100
+
+###
+GET http://localhost:3001/api/cards/2

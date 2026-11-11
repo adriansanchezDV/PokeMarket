@@ -86,3 +86,116 @@ Content-Type: application/json
   "email": "seller2@test.com",
   "password": "12345678!"
 }
+
+### Login customer1
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "adrian2@test.com",
+  "password": "12345678"
+}
+
+### Login seller2
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "seller2@test.com",
+  "password": "12345678!"
+}
+
+### Crear tienda
+POST http://localhost:3001/api/sellers/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJzZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDEwMzY4NCwiZXhwIjoxNzkwMTA3Mjg0fQ.mfFIRehr987KEY1SvyxQsGCXjp77tzAM4eMDd8kmu9U
+Content-Type: application/json
+
+{
+  "storeName": "Seller Two TCG Store",
+  "description": "Tienda especializada en cartas Pokémon TCG"
+}
+
+### Crear producto
+POST http://localhost:3001/api/products
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJzZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzgzNywiZXhwIjoxNzkxMzk3NDM3fQ.-_pht6h94T-sOdACQDJAhagLf-d02lYqzcwixLsbjJg
+Content-Type: application/json
+
+{
+  "cardId": 2,
+  "condition": "Near Mint",
+  "language": "English",
+  "price": 12.50,
+  "stock": 5,
+  "description": "Carta en excelente estado"
+}
+
+
+### Añadir producto al carrito
+POST http://localhost:3001/api/cart/items/14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzgxMSwiZXhwIjoxNzkxMzk3NDExfQ.kKkZgOuHX4CIE3vKeTFH5ILCqoPAgeezn901pNS2bpY
+
+### Ver carrito
+GET http://localhost:3001/api/cart
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzgxMSwiZXhwIjoxNzkxMzk3NDExfQ.kKkZgOuHX4CIE3vKeTFH5ILCqoPAgeezn901pNS2bpY
+
+
+
+### Crear pedido
+POST http://localhost:3001/api/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzgxMSwiZXhwIjoxNzkxMzk3NDExfQ.kKkZgOuHX4CIE3vKeTFH5ILCqoPAgeezn901pNS2bpY
+Content-Type: application/json
+
+{
+  "shippingAddressId": 3
+  
+}
+
+###
+POST http://localhost:3001/api/orders/15/cancel
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzgxMSwiZXhwIjoxNzkxMzk3NDExfQ.kKkZgOuHX4CIE3vKeTFH5ILCqoPAgeezn901pNS2bpY
+
+### Pagar pedido
+POST http://localhost:3001/api/orders/14/pay
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzgxMSwiZXhwIjoxNzkxMzk3NDExfQ.kKkZgOuHX4CIE3vKeTFH5ILCqoPAgeezn901pNS2bpY
+
+
+### Ver pedidos de mi tienda
+GET http://localhost:3001/api/seller/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJzZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDEwMzY4NCwiZXhwIjoxNzkwMTA3Mjg0fQ.mfFIRehr987KEY1SvyxQsGCXjp77tzAM4eMDd8kmu9U
+
+###
+PATCH http://localhost:3001/api/seller/orders/14/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJzZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzgzNywiZXhwIjoxNzkxMzk3NDM3fQ.-_pht6h94T-sOdACQDJAhagLf-d02lYqzcwixLsbjJg
+Content-Type: application/json
+
+{
+  "status": "delivered"
+}
+
+
+###
+GET http://localhost:3001/api/products/seller
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJzZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDE4NTQyMiwiZXhwIjoxNzkwMTg5MDIyfQ.vwM22Qv-2_jHmpIcERJoU-mUKCR6L0VJIn_Pne4z05g
+
+###
+PATCH http://localhost:3001/api/products/12
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJzZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDE4NTQyMiwiZXhwIjoxNzkwMTg5MDIyfQ.vwM22Qv-2_jHmpIcERJoU-mUKCR6L0VJIn_Pne4z05g
+Content-Type: application/json
+
+{
+  "price": 17.50,
+  "stock": 1
+}
+
+###
+PATCH http://localhost:3001/api/products/13/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJzZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDE4NTQyMiwiZXhwIjoxNzkwMTg5MDIyfQ.vwM22Qv-2_jHmpIcERJoU-mUKCR6L0VJIn_Pne4z05g
+Content-Type: application/json
+
+{
+  "isActive": true
+}
+
+####
+GET http://localhost:3001/api/seller/stats
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJzZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDI3NDIwOCwiZXhwIjoxNzkwMjc3ODA4fQ.GACdvLSdzrzs3VMxlS9wvgOFA0RrnC_BQ17RQsQlUVg

@@ -13,7 +13,7 @@ GET http://localhost:3001/api/products/11
 
 ### Crear valoración del producto comprado
 POST http://localhost:3001/api/products/11/reviews
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiZW1haWwiOiJjdXN0b21lcjFAdGVzdC5jb20iLCJyb2xlIjoiY3VzdG9tZXIiLCJpYXQiOjE3OTA3OTUwNDgsImV4cCI6MTc5MDc5ODY0OH0.9m_H66C6YeXEbmVBY_kwFeGsZTPro_yeYFVryoZHTNU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiZW1haWwiOiJjdXN0b21lcjFAdGVzdC5jb20iLCJyb2xlIjoiY3VzdG9tZXIiLCJpYXQiOjE3OTA4NzcxNzcsImV4cCI6MTc5MDg4MDc3N30.6IrEkbpOLdLCLQOJCDMREJUyNhNWpSN3MRzBWkVKceA
 Content-Type: application/json
 
 {
@@ -31,18 +31,13 @@ Content-Type: application/json
   "comment": "La carta llegó en perfecto estado. Muy buena experiencia de compra."
 }
 
+### Eliminar mi review
+DELETE http://localhost:3001/api/products/11/reviews/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiZW1haWwiOiJjdXN0b21lcjFAdGVzdC5jb20iLCJyb2xlIjoiY3VzdG9tZXIiLCJpYXQiOjE3OTA4NzcxNzcsImV4cCI6MTc5MDg4MDc3N30.6IrEkbpOLdLCLQOJCDMREJUyNhNWpSN3MRzBWkVKceA
 
-
-### Reviews después de eliminar
-GET http://localhost:3001/api/products/11/reviews
 
 ### Reviews de Butterfree VMAX
 GET http://localhost:3001/api/products/11/reviews
 
-
-### Store 3
-GET http://localhost:3001/api/stores/3
-
-
-### Store 1
-GET http://localhost:3001/api/stores/1
+### Reviews página 1
+GET http://localhost:3001/api/products/11/reviews?page=1&limit=5

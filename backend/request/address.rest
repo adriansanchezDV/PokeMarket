@@ -1,6 +1,15 @@
+### Login test seller
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "testseller@test.com",
+  "password": "Password123"
+}
+
 ### Create first shipping address
 POST http://localhost:3001/api/shipping-addresses
-Authorization: Bearer {{token}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3OTEyMjE4MzIsImV4cCI6MTc5MTIyNTQzMn0.Mses3eGHZEFaM2dnFCuRht0Wn8N9FZb-0fX5lUBpRko
 Content-Type: application/json
 
 {
@@ -12,3 +21,78 @@ Content-Type: application/json
   "country": "España",
   "phone": "600123456"
 }
+
+
+### Create second shipping address
+POST http://localhost:3001/api/shipping-addresses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzgxMSwiZXhwIjoxNzkxMzk3NDExfQ.kKkZgOuHX4CIE3vKeTFH5ILCqoPAgeezn901pNS2bpY
+Content-Type: application/json
+
+{
+  "recipientName": "Adrian Sánchez",
+  "street": "Calle Nueva 50",
+  "city": "Toledo",
+  "postalCode": "45001",
+  "province": "Toledo",
+  "country": "España",
+  "phone": "600123456"
+}
+
+
+### Get shipping addresses
+GET http://localhost:3001/api/shipping-addresses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTM5MzgxMSwiZXhwIjoxNzkxMzk3NDExfQ.kKkZgOuHX4CIE3vKeTFH5ILCqoPAgeezn901pNS2bpY
+
+
+### Get shipping address by id
+GET http://localhost:3001/api/shipping-addresses/4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3OTEyMjE4MzIsImV4cCI6MTc5MTIyNTQzMn0.Mses3eGHZEFaM2dnFCuRht0Wn8N9FZb-0fX5lUBpRko
+
+
+### Set address 2 as default
+PATCH http://localhost:3001/api/shipping-addresses/2/default
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3OTEyMjE4MzIsImV4cCI6MTc5MTIyNTQzMn0.Mses3eGHZEFaM2dnFCuRht0Wn8N9FZb-0fX5lUBpRko
+
+
+
+### Update shipping address
+PATCH http://localhost:3001/api/shipping-addresses/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3OTEyMjE4MzIsImV4cCI6MTc5MTIyNTQzMn0.Mses3eGHZEFaM2dnFCuRht0Wn8N9FZb-0fX5lUBpRko
+Content-Type: application/json
+
+{
+  "street": "Calle Nueva 100",
+  "postalCode": "45002"
+}
+
+
+### Delete shipping address
+DELETE http://localhost:3001/api/shipping-addresses/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3OTEyMjE4MzIsImV4cCI6MTc5MTIyNTQzMn0.Mses3eGHZEFaM2dnFCuRht0Wn8N9FZb-0fX5lUBpRko
+
+### Create order with saved shipping address
+POST http://localhost:3001/api/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3OTEyMjE4MzIsImV4cCI6MTc5MTIyNTQzMn0.Mses3eGHZEFaM2dnFCuRht0Wn8N9FZb-0fX5lUBpRko
+Content-Type: application/json
+
+{
+  "shippingAddressId": 1
+}
+
+### Añadir producto al carrito
+POST http://localhost:3001/api/cart/items/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3OTEyMjE4MzIsImV4cCI6MTc5MTIyNTQzMn0.Mses3eGHZEFaM2dnFCuRht0Wn8N9FZb-0fX5lUBpRko
+
+
+### Create order with saved shipping address
+POST http://localhost:3001/api/orders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3OTEyMjE4MzIsImV4cCI6MTc5MTIyNTQzMn0.Mses3eGHZEFaM2dnFCuRht0Wn8N9FZb-0fX5lUBpRko
+Content-Type: application/json
+
+{
+  "shippingAddressId": 1
+}
+
+###
+GET http://localhost:3001/api/orders/13
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3OTEyMjE4MzIsImV4cCI6MTc5MTIyNTQzMn0.Mses3eGHZEFaM2dnFCuRht0Wn8N9FZb-0fX5lUBpRko

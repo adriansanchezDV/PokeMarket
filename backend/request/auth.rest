@@ -3,20 +3,127 @@ POST http://localhost:3001/api/auth/register
 Content-Type: application/json
 
 {
-  "fullName": "Adrian Test",
-  "email": "adrian@test.com",
-  "password": "123456"
+  "fullName": "AdrianAdmin",
+  "email": "admin@admin.com",
+  "password": "12345678"
 }
 
-### Login
+
+### Login como customer
 POST http://localhost:3001/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "adrian@test.com",
-  "password": "123456"
+  "email": "adrian1@test.com",
+  "password": "12345678"
 }
 
+### Crear seller profile
+POST http://localhost:3001/api/sellers/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJzZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDEwMzY4NCwiZXhwIjoxNzkwMTA3Mjg0fQ.mfFIRehr987KEY1SvyxQsGCXjp77tzAM4eMDd8kmu9U
+Content-Type: application/json
+
+{
+  "storeName": "Adrian Pokémon Cards",
+  "description": "Tienda especializada en cartas Pokémon TCG"
+}
+
+### Obtener mi perfil
+GET http://localhost:3001/api/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6ImN1c3RvbWVyIiwiaWF0IjoxNzg5NDEwMDc4LCJleHAiOjE3ODk0MTM2Nzh9.gdV9gknBW3ehFjpg04_98rMw_7DFfQXiG966jZWn-0g
+
+### Cambiar nombre
+PATCH http://localhost:3001/api/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6ImN1c3RvbWVyIiwiaWF0IjoxNzg5NDEwMDc4LCJleHAiOjE3ODk0MTM2Nzh9.gdV9gknBW3ehFjpg04_98rMw_7DFfQXiG966jZWn-0g
+Content-Type: application/json
+
+{
+  "fullName": "Adrian Sánchez"
+}
+
+### Acceso seller
+GET http://localhost:3001/api/auth/seller-test
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6ImN1c3RvbWVyIiwiaWF0IjoxNzg5OTI5MDQ1LCJleHAiOjE3ODk5MzI2NDV9.8wKytsKjtvHCXsBU-HsiccMBmE8iI2OnX_ZLPME_ABQ
 ### Con token
 GET http://localhost:3001/api/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJhZHJpYW
+
+
+
+
+### Register
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Adrian Nuevo",
+  "email": "adrian2@test.com",
+  "password": "12345678"
+}
+
+
+
+
+### Registro correcto
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Nuevo Usuario",
+  "email": "nuevo@test.com",
+  "password": "password123"
+}
+
+### Email inválido
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Usuario",
+  "email": "email-invalido",
+  "password": "password123"
+}
+
+### Contraseña demasiado corta
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Usuario",
+  "email": "otro@test.com",
+  "password": "123"
+}
+
+### Email duplicado
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Adrian Test",
+  "email": "adrian2@test.com",
+  "password": "password123"
+}
+
+
+### Ver perfil público
+GET http://localhost:3001/api/sellers/1
+
+
+### Modificar perfil de vendedor
+PATCH http://localhost:3001/api/sellers/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZHJpYW4yQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc4OTQxMTk4NywiZXhwIjoxNzg5NDE1NTg3fQ.AThRm3yjaGo8lSlGIMK0xTflA23tEKzEJG4z2WRQtfA
+Content-Type: application/json
+
+{
+  "storeName": "Adrian TCG Store",
+  "description": "Especialistas en cartas Pokémon TCG nuevas y coleccionables"
+}
+
+### Obtener sets desde TCGdex
+GET https://api.tcgdex.net/v2/en/sets
+
+### Obtener un set concreto
+GET https://api.tcgdex.net/v2/en/sets/swsh3
+
+### TCGdex - carta concreta
+GET https://api.tcgdex.net/v2/en/cards/swsh3-136

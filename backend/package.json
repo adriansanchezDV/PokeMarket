@@ -12,7 +12,12 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:prepare": "tsx scripts/prepareTestDatabase.ts",
+    "test:check": "tsx scripts/prepareTestDatabase.ts --check",
+    "typecheck:tests": "tsc --project tsconfig.tests.json --noEmit"
   },
   "keywords": [],
   "author": "",

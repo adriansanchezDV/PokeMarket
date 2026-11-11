@@ -1,0 +1,29 @@
+
+@baseUrl = http://localhost:3001/api/sets
+
+### 1. Primera petición: debería aparecer Redis cache MISS
+GET {{baseUrl}}
+
+### 2. Segunda petición: debería aparecer Redis cache HIT
+GET {{baseUrl}}
+
+### 3. Primera petición de detalle: cache MISS
+GET {{baseUrl}}/1
+
+### 4. Segunda petición de detalle: cache HIT
+GET {{baseUrl}}/1
+
+### 1. Confirmar que el listado está cacheado
+GET {{baseUrl}}
+
+### 2. Sincronizar Darkness Ablaze
+POST {{baseUrl}}/swsh3/sync
+
+### 3. Volver a pedir el listado: esperamos MISS
+GET {{baseUrl}}
+
+### 4. Volver a pedir el detalle del set 1: esperamos MISS
+GET {{baseUrl}}/1
+
+### 5. Repetir el detalle: esperamos HIT
+GET {{baseUrl}}/1

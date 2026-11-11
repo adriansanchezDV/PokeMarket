@@ -1,0 +1,34 @@
+### Login como customer
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "adrian1@test.com",
+  "password": "12345678"
+}
+
+### Add product to favorites
+POST http://localhost:3001/api/favorites/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTIyNTYwMywiZXhwIjoxNzkxMjI5MjAzfQ.3C0TFpccPBN6nOTd6A7TUNRkWNh_Wfp7TmjHeu2ce0g
+
+### Get my favorites
+GET http://localhost:3001/api/favorites
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTMwOTE2NSwiZXhwIjoxNzkxMzEyNzY1fQ.QpsncjktqTVmjUXdNY7YRj2BPc_Bn99-TTMewJDLE-M
+
+### Remove favorite
+DELETE http://localhost:3001/api/favorites/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MDAxNDM4OSwiZXhwIjoxNzkwMDE3OTg5fQ.jDgHQ4ktoPROr0HNn1RADUcKKzBeDSSepryilt6xcMs
+
+### Favorite non-existing product
+POST http://localhost:3001/api/favorites/99999
+Authorization: Bearer regff
+
+
+
+### Producto sin autenticación
+GET http://localhost:3001/api/products/1
+
+
+### Producto autenticado
+GET http://localhost:3001/api/products/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwiZW1haWwiOiJhZHJpYW4xQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTIyNTYwMywiZXhwIjoxNzkxMjI5MjAzfQ.3C0TFpccPBN6nOTd6A7TUNRkWNh_Wfp7TmjHeu2ce0g

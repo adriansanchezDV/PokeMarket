@@ -50,6 +50,10 @@ export const markAsRead = async (req: Request, res: Response) => {
     const userId = req.user!.id;
     const notificationId = Number(req.params.id);
 
+    if (!Number.isInteger(notificationId) || notificationId <= 0) {
+      return res.status(400).json({ message: 'Invalid notification ID' });
+    }
+
     const notification = await markNotificationAsRead(notificationId, userId);
 
     if (!notification) {

@@ -10,14 +10,12 @@ import Card from '../models/CardModel.js';
 import SellerProfile from '../models/SellerProfileModel.js';
 
 export const getOrCreateCart = async (userId: number, transaction?: Transaction) => {
-  let cart = await Cart.findOne({
+  const [cart] = await Cart.findOrCreate({
     where: { userId },
+    defaults: { userId },
     transaction,
+    lock: transaction?.LOCK.UPDATE,
   });
-
-  if (!cart) {
-    cart = await Cart.create({ userId }, { transaction });
-  }
 
   return cart;
 };
@@ -81,6 +79,7 @@ export const getCart = async (userId: number) => {
 
 export const addItemToCart = async (userId: number, productId: number) => {
   return sequelize.transaction(async (transaction) => {
+    const cart = await getOrCreateCart(userId, transaction);
     const product = await Product.findByPk(productId, { transaction });
 
     if (!product) {
@@ -94,8 +93,6 @@ export const addItemToCart = async (userId: number, productId: number) => {
     if (product.stock <= 0) {
       throw new AppError(409, 'Product out of stock');
     }
-
-    const cart = await getOrCreateCart(userId, transaction);
 
     const existingItem = await CartItem.findOne({
       transaction,
@@ -133,6 +130,7 @@ export const updateCartItem = async (userId: number, productId: number, quantity
   return sequelize.transaction(async (transaction) => {
     const cart = await Cart.findOne({
       transaction,
+      lock: transaction.LOCK.UPDATE,
       where: { userId },
     });
 
@@ -182,40 +180,50 @@ export const updateCartItem = async (userId: number, productId: number, quantity
 };
 
 export const removeItemFromCart = async (userId: number, productId: number) => {
-  const cart = await Cart.findOne({
-    where: { userId },
+  return sequelize.transaction(async (transaction) => {
+    const cart = await Cart.findOne({
+      where: { userId },
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    });
+
+    if (!cart) {
+      throw new AppError(404, 'Cart not found');
+    }
+
+    const item = await CartItem.findOne({
+      transaction,
+      where: {
+        cartId: cart.id,
+        productId,
+      },
+    });
+
+    if (!item) {
+      throw new AppError(404, 'Cart item not found');
+    }
+
+    await item.destroy({ transaction });
   });
-
-  if (!cart) {
-    throw new AppError(404, 'Cart not found');
-  }
-
-  const item = await CartItem.findOne({
-    where: {
-      cartId: cart.id,
-      productId,
-    },
-  });
-
-  if (!item) {
-    throw new AppError(404, 'Cart item not found');
-  }
-
-  await item.destroy();
 };
 
 export const clearCart = async (userId: number) => {
-  const cart = await Cart.findOne({
-    where: { userId },
-  });
+  return sequelize.transaction(async (transaction) => {
+    const cart = await Cart.findOne({
+      where: { userId },
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    });
 
-  if (!cart) {
-    return;
-  }
+    if (!cart) {
+      return;
+    }
 
-  await CartItem.destroy({
-    where: {
-      cartId: cart.id,
-    },
+    await CartItem.destroy({
+      transaction,
+      where: {
+        cartId: cart.id,
+      },
+    });
   });
 };

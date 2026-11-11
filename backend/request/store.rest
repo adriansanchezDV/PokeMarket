@@ -1,0 +1,61 @@
+### Crear usuario de prueba
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Test Seller",
+  "email": "testseller@test.com",
+  "password": "Password123"
+}
+### Login test seller
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "testseller@test.com",
+  "password": "Password123"
+}
+
+### Crear perfil de vendedor
+POST http://localhost:3001/api/sellers/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc5MDc5MTQwOCwiZXhwIjoxNzkwNzk1MDA4fQ.zTxYCI47Gksa7FJwlW1CuBXFYnxp8Jkw2HIsleKc0r8
+Content-Type: application/json
+
+{
+  "storeName": "Test Pokemon Store",
+  "description": "Tienda de pruebas de PokéMarket"
+}
+
+###
+PATCH http://localhost:3001/api/sellers/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3OTA3OTE0MzQsImV4cCI6MTc5MDc5NTAzNH0.KtzQGCukxlcCZ11tX9vX_yHyqoaUD9b1Hub2htSEpLM
+Content-Type: application/json
+
+{
+  "description": "Descripción actualizada de mi tienda"
+}
+
+
+### Obtener todas las tiendas
+GET http://localhost:3001/api/stores
+
+### Obtener una tienda
+GET http://localhost:3001/api/stores/5
+
+
+### Productos de una tienda
+GET http://localhost:3001/api/stores/3/products
+
+### Tienda inexistente
+GET http://localhost:3001/api/stores/99999
+
+### Obtener tienda concreta
+GET http://localhost:3001/api/stores/2
+
+
+### ID inválido
+GET http://localhost:3001/api/stores/abc
+
+
+### Productos de tienda inexistente
+GET http://localhost:3001/api/stores/99999/products

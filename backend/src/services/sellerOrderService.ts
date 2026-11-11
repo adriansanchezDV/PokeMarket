@@ -20,7 +20,7 @@ export const getSellerOrders = async (userId: number) => {
       {
         model: Order,
         as: 'order',
-        attributes: ['id', 'userId', 'status', 'total', 'shippingAddress', 'created_at'],
+        attributes: ['id', 'userId', 'status', 'shippingAddress', 'created_at'],
       },
     ],
     order: [[col('OrderItem.created_at'), 'DESC']],
@@ -118,10 +118,12 @@ export const updateSellerOrderItemStatus = async (
 
     return Order.findByPk(orderItem.orderId, {
       transaction,
+      attributes: { exclude: ['total'] },
       include: [
         {
           model: OrderItem,
           as: 'items',
+          where: { sellerProfileId: sellerProfile.id },
         },
       ],
     });

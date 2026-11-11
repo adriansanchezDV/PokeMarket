@@ -1,7 +1,18 @@
-import { col, Op } from 'sequelize';
+import { col, Op, type Transaction } from 'sequelize';
 
 import sequelize from '../config/database.js';
 import ShippingAddress from '../models/ShippingAdressModel.js';
+import User from '../models/UserModel.js';
+import { AppError } from '../utils/AppError.js';
+
+const lockAddressOwner = async (userId: number, transaction: Transaction) => {
+  const user = await User.findByPk(userId, {
+    attributes: ['id'],
+    transaction,
+    lock: transaction.LOCK.UPDATE,
+  });
+  if (!user) throw new AppError(404, 'User not found');
+};
 
 type ShippingAddressData = {
   recipientName: string;
@@ -35,6 +46,7 @@ export const getShippingAddressById = async (userId: number, addressId: number) 
 
 export const createShippingAddress = async (userId: number, data: ShippingAddressData) => {
   return sequelize.transaction(async (transaction) => {
+    await lockAddressOwner(userId, transaction);
     const shouldBeDefault =
       data.isDefault === true ||
       (await ShippingAddress.count({
@@ -75,6 +87,7 @@ export const updateShippingAddress = async (
   data: Partial<ShippingAddressData>,
 ) => {
   return sequelize.transaction(async (transaction) => {
+    await lockAddressOwner(userId, transaction);
     const address = await ShippingAddress.findOne({
       where: {
         id: addressId,
@@ -111,6 +124,7 @@ export const updateShippingAddress = async (
 
 export const deleteShippingAddress = async (userId: number, addressId: number) => {
   return sequelize.transaction(async (transaction) => {
+    await lockAddressOwner(userId, transaction);
     const address = await ShippingAddress.findOne({
       where: {
         id: addressId,
@@ -148,6 +162,7 @@ export const deleteShippingAddress = async (userId: number, addressId: number) =
 
 export const setDefaultShippingAddress = async (userId: number, addressId: number) => {
   return sequelize.transaction(async (transaction) => {
+    await lockAddressOwner(userId, transaction);
     const address = await ShippingAddress.findOne({
       where: {
         id: addressId,

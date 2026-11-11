@@ -12,3 +12,88 @@ GET http://localhost:3001/api/cards/1
 
 ### 5. Repetir el detalle: debería producir HIT
 GET http://localhost:3001/api/cards/1
+
+
+
+### Variables
+@baseUrl = http://localhost:3001/api
+@cardId = 1
+@productId = 25
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImVtYWlsIjoidGVzdHNlbGxlckB0ZXN0LmNvbSIsInJvbGUiOiJzZWxsZXIiLCJpYXQiOjE3OTI0MjQ1NzIsImV4cCI6MTc5MjQyODE3Mn0.XmrWJIbrJTphqvAGBNBDHUfFaVfKb-IsorgZIQ6ii6s
+
+### 1. Consultar detalle de la carta (primera vez: MISS)
+GET {{baseUrl}}/cards/{{cardId}}
+
+### 2. Repetir detalle (debería ser HIT)
+GET {{baseUrl}}/cards/{{cardId}}
+
+### 3. Modificar precio y stock del producto
+###
+POST http://localhost:3001/api/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "cardId": 1,
+  "condition": "Near Mint",
+  "language": "English",
+  "price": 12.50,
+  "stock": 3
+}
+###
+PATCH {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "price": 20,
+  "stock": 5
+}
+
+### 4. Volver a consultar el detalle (debería ser MISS)
+GET {{baseUrl}}/cards/{{cardId}}
+
+### 5. Repetir detalle (debería ser HIT)
+GET {{baseUrl}}/cards/{{cardId}}
+
+### 6. Desactivar el producto
+PATCH {{baseUrl}}/products/{{productId}}/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+### 7. Consultar detalle tras desactivar (debería ser MISS)
+GET {{baseUrl}}/cards/{{cardId}}
+
+### 8. Activar el producto
+PATCH {{baseUrl}}/products/{{productId}}/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "isActive": true
+}
+
+### 9. Consultar detalle tras activar (debería ser MISS)
+GET {{baseUrl}}/cards/{{cardId}}
+
+
+
+
+### 1. Primera búsqueda: MISS esperado
+GET http://localhost:3001/api/cards?search=Charizard&page=1&limit=10
+
+### 2. Repetir búsqueda: HIT esperado
+GET http://localhost:3001/api/cards?search=Charizard&page=1&limit=10
+
+### 3. Cambiar filtro: MISS esperado
+GET http://localhost:3001/api/cards?search=Charizard&page=1&limit=10&rarity=Rare
+
+### 4. Volver a la búsqueda original: HIT esperado
+GET http://localhost:3001/api/cards?search=Charizard&page=1&limit=10
+
+### 5. Repetir búsqueda con otra página: MISS esperado
+GET http://localhost:3001/api/cards?search=Charizard&page=2&limit=10

@@ -1,0 +1,9 @@
+### Actualizar stock del producto
+PATCH http://localhost:3001/api/products/24
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoibm90aWZpY2F0aW9ucy5zZWxsZXIyQHRlc3QuY29tIiwicm9sZSI6InNlbGxlciIsImlhdCI6MTc5MTgyNDY0NSwiZXhwIjoxNzkxODI4MjQ1fQ.tlDfglzw35teWOVs2v3vIxdGx8KVdlF9bgMzmoNFhJQ
+Content-Type: application/json
+
+{
+  "price": 1,
+  "stock": 1
+}
