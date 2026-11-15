@@ -3,11 +3,9 @@ import { Link, useLocation } from 'react-router';
 import { LoginForm } from '../components/LoginForm';
 
 export function LoginPage() {
+  const location = useLocation();
 
-const location = useLocation();
-
-const registrationSuccess =
-  location.state?.registrationSuccess === true;
+  const registrationSuccess = location.state?.registrationSuccess === true;
 
   return (
     <section className="mx-auto w-full max-w-md py-12">
@@ -17,13 +15,10 @@ const registrationSuccess =
         <p className="mb-8 text-center text-sm text-gray-500">Accede a tu cuenta de PokéMarket</p>
 
         {registrationSuccess && (
-  <p
-    role="status"
-    className="mb-6 rounded-lg bg-green-50 p-3 text-sm text-green-700"
-  >
-    Tu cuenta se ha creado correctamente. Ya puedes iniciar sesión.
-  </p>
-)}
+          <p role="status" className="mb-6 rounded-lg bg-green-50 p-3 text-sm text-green-700">
+            Tu cuenta se ha creado correctamente. Ya puedes iniciar sesión.
+          </p>
+        )}
 
         <LoginForm />
 

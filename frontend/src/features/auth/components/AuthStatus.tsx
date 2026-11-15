@@ -1,9 +1,7 @@
 import { Link, useNavigate } from 'react-router';
 
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
-import { baseApi } from '@/services/api/baseApi';
-import { logout } from '../store/authSlice';
-
+import { clearAuthSession } from '../store/authSession';
 export function AuthStatus() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -11,8 +9,7 @@ export function AuthStatus() {
   const user = useAppSelector((state) => state.auth.user);
 
   function handleLogout() {
-    dispatch(logout());
-    dispatch(baseApi.util.resetApiState());
+    clearAuthSession(dispatch);
     navigate('/');
   }
 

@@ -6,8 +6,9 @@ export interface User {
   email: string;
   role: UserRole;
   isBanned: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
-
 export interface LoginRequest {
   email: string;
   password: string;

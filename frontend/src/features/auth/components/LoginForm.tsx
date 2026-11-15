@@ -5,6 +5,8 @@ import { useAppDispatch } from '@/app/store/hooks';
 import { useLoginMutation } from '../api/authApi';
 import { setCredentials } from '../store/authSlice';
 
+import { saveToken } from '../utils/authStorage';
+
 export function LoginForm() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -29,6 +31,7 @@ export function LoginForm() {
     try {
       const response = await login({ email, password }).unwrap();
 
+      saveToken(response.token);
       dispatch(setCredentials(response));
 
       navigate(redirectTo, { replace: true });
