@@ -73,7 +73,7 @@ export function CardDetailPage() {
           <p>Rareza: {card.rarity ?? 'Sin datos'}</p>
           <p>Categoría: {card.category ?? 'Sin datos'}</p>
           <p>HP: {card.hp ?? 'No aplica'}</p>
-          <p>Tipo: {card.types.join(', ') || 'Sin datos'}</p>
+          <p>Tipo: {card.types?.join(', ') || 'Sin datos'}</p>
           <p>Ilustrador: {card.artist ?? 'Sin datos'}</p>
 
           {card.description && <p>{card.description}</p>}

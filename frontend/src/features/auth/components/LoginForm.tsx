@@ -1,22 +1,25 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 
-import { useAppDispatch } from '@/app/store/hooks';
+import { useAppDispatch, useAppStore } from '@/app/store/hooks';
 import { useLoginMutation } from '../api/authApi';
-import { setCredentials } from '../store/authSlice';
-
-import { saveToken } from '../utils/authStorage';
+import { setAuthSessionIfCurrent } from '../store/authSession';
+import { getApiErrorMessage } from '@/services/api/apiError';
 
 export function LoginForm() {
   const dispatch = useAppDispatch();
+  const store = useAppStore();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = location.state?.from;
   const redirectTo =
-    from && typeof from.pathname === 'string'
+    from &&
+    typeof from.pathname === 'string' &&
+    from.pathname.startsWith('/') &&
+    !from.pathname.startsWith('//')
       ? `${from.pathname}${from.search ?? ''}${from.hash ?? ''}`
-      : '/';
+      : '/account';
 
   const [login, { isLoading }] = useLoginMutation();
 
@@ -27,16 +30,16 @@ export function LoginForm() {
   async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
+    const sessionId = store.getState().auth.sessionId;
 
     try {
       const response = await login({ email, password }).unwrap();
 
-      saveToken(response.token);
-      dispatch(setCredentials(response));
-
-      navigate(redirectTo, { replace: true });
-    } catch {
-      setError('No se ha podido iniciar sesión. Comprueba tus credenciales.');
+      if (dispatch(setAuthSessionIfCurrent(response, sessionId))) {
+        navigate(redirectTo, { replace: true });
+      }
+    } catch (error: unknown) {
+      setError(getApiErrorMessage(error, 'No se ha podido iniciar sesión. Inténtalo de nuevo.'));
     }
   }
 

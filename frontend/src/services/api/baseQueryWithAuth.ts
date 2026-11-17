@@ -34,7 +34,14 @@ export const baseQueryWithAuth: BaseQueryFn<
 
   const result = await rawBaseQuery(args, api, extraOptions);
 
-  if (result.error?.status !== 401 || !tokenBeforeRequest) {
+  const isBanned =
+    result.error?.status === 403 &&
+    typeof result.error.data === 'object' &&
+    result.error.data !== null &&
+    'error' in result.error.data &&
+    result.error.data.error === 'User account is banned';
+
+  if ((result.error?.status !== 401 && !isBanned) || !tokenBeforeRequest) {
     return result;
   }
 

@@ -11,16 +11,14 @@ const PAGE_LIMIT = 20;
 export function CatalogPage() {
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
- const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-const setIdParam = searchParams.get('setId');
+  const setIdParam = searchParams.get('setId');
 
-const setId =
-  setIdParam !== null &&
-  Number.isInteger(Number(setIdParam)) &&
-  Number(setIdParam) > 0
-    ? Number(setIdParam)
-    : undefined;
+  const setId =
+    setIdParam !== null && Number.isInteger(Number(setIdParam)) && Number(setIdParam) > 0
+      ? Number(setIdParam)
+      : undefined;
   const [page, setPage] = useState(1);
 
   const { data: sets, isError: isSetsError } = useGetSetsQuery();
@@ -41,33 +39,33 @@ const setId =
     setSearch(searchInput.trim());
   };
 
- const handleSetChange = (value: string) => {
-  setPage(1);
+  const handleSetChange = (value: string) => {
+    setPage(1);
 
-  setSearchParams((previousParams) => {
-    const nextParams = new URLSearchParams(previousParams);
+    setSearchParams((previousParams) => {
+      const nextParams = new URLSearchParams(previousParams);
 
-    if (value === '') {
+      if (value === '') {
+        nextParams.delete('setId');
+      } else {
+        nextParams.set('setId', value);
+      }
+
+      return nextParams;
+    });
+  };
+
+  const handleClearFilters = () => {
+    setSearchInput('');
+    setSearch('');
+    setPage(1);
+
+    setSearchParams((previousParams) => {
+      const nextParams = new URLSearchParams(previousParams);
       nextParams.delete('setId');
-    } else {
-      nextParams.set('setId', value);
-    }
-
-    return nextParams;
-  });
-};
-
- const handleClearFilters = () => {
-  setSearchInput('');
-  setSearch('');
-  setPage(1);
-
-  setSearchParams((previousParams) => {
-    const nextParams = new URLSearchParams(previousParams);
-    nextParams.delete('setId');
-    return nextParams;
-  });
-};
+      return nextParams;
+    });
+  };
   const handlePreviousPage = () => {
     setPage((currentPage) => Math.max(1, currentPage - 1));
   };

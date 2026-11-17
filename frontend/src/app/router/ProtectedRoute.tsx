@@ -7,9 +7,10 @@ import type { UserRole } from '@/features/auth/types/auth.types';
 
 interface ProtectedRouteProps {
   allowedRoles?: UserRole[];
+  redirectByRole?: Partial<Record<UserRole, string>>;
 }
 
-export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
+export function ProtectedRoute({ allowedRoles, redirectByRole }: ProtectedRouteProps) {
   const dispatch = useAppDispatch();
 
   const { user, token, status } = useAppSelector((state) => state.auth);
@@ -49,7 +50,7 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/forbidden" replace />;
+    return <Navigate to={redirectByRole?.[user.role] ?? '/forbidden'} replace />;
   }
 
   return <Outlet />;

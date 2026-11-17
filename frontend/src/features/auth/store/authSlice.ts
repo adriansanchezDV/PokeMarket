@@ -45,7 +45,7 @@ const authSlice = createSlice({
       if (
         state.sessionId !== action.payload.sessionId ||
         !state.token ||
-        state.status !== 'checking'
+        (state.status !== 'checking' && state.status !== 'authenticated')
       ) {
         return;
       }

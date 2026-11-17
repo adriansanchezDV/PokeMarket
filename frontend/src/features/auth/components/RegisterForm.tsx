@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useRegisterMutation } from '../api/authApi';
+import { getApiErrorMessage } from '@/services/api/apiError';
 
 export function RegisterForm() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export function RegisterForm() {
 
     try {
       await register({
-        fullName: fullName.trim(),
+        fullName: fullName.trim() || undefined,
         email: email.trim(),
         password,
       }).unwrap();
@@ -39,8 +40,8 @@ export function RegisterForm() {
         replace: true,
         state: { registrationSuccess: true },
       });
-    } catch {
-      setError('No se ha podido completar el registro.');
+    } catch (error: unknown) {
+      setError(getApiErrorMessage(error, 'No se ha podido completar el registro.'));
     }
   }
 
@@ -48,14 +49,15 @@ export function RegisterForm() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
         <label htmlFor="fullName" className="text-sm font-medium">
-          Nombre completo
+          Nombre completo (opcional)
         </label>
 
         <input
           id="fullName"
           type="text"
           autoComplete="name"
-          required
+          minLength={2}
+          maxLength={255}
           value={fullName}
           onChange={(event) => setFullName(event.target.value)}
           className="rounded-lg border border-gray-300 px-4 py-3"

@@ -12,16 +12,17 @@ export function AuthSync() {
   const { token, status, sessionId } = useAppSelector((state) => state.auth);
 
   const {
-    data: user,
+    currentData: user,
     error,
     isSuccess,
     isError,
+    isFetching,
   } = useGetMeQuery(sessionId, {
     skip: !token,
   });
 
   useEffect(() => {
-    if (!token || status !== 'checking') {
+    if (!token || isFetching || (status !== 'checking' && status !== 'authenticated')) {
       return;
     }
 
@@ -43,8 +44,10 @@ export function AuthSync() {
       return;
     }
 
-    dispatch(sessionValidationError(sessionId));
-  }, [token, status, sessionId, user, error, isSuccess, isError, dispatch]);
+    if (status === 'checking') {
+      dispatch(sessionValidationError(sessionId));
+    }
+  }, [token, status, sessionId, user, error, isSuccess, isError, isFetching, dispatch]);
 
   return null;
 }

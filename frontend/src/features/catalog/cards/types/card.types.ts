@@ -3,14 +3,14 @@ export interface PokemonCard {
   tcgdexId: string;
   setId: number;
   name: string;
-  number: string;
+  number: string | null;
   rarity: string | null;
   imageUrl: string | null;
   category: string | null;
   hp: number | null;
   artist: string | null;
   description: string | null;
-  types: string[];
+  types: string[] | null;
   created_at: string;
   updated_at: string;
 }
